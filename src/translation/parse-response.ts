@@ -24,6 +24,9 @@ export function getJson(response: string): SubtitleNoTime[] {
   const a = '```json\n'
   const b = '\n```'
   const removedThink = removeWrapped(response, '<think>', '</think>')
-  const jsonString = keepOnlyWrapped(removedThink, a, b).replace(a, '').replace(b, '') || removedThink || '[]'
+  const jsonString = keepOnlyWrapped(removedThink, a, b).replace(a, '').replace(b, '')
+    || keepOnlyWrapped(removedThink, b, b).replaceAll(b, '')
+    || removedThink
+    || '[]'
   return JSON.parse(jsonString)
 }

@@ -12,7 +12,6 @@ export interface Subtitle {
     end: Timestamp
   }
   content: string
-  translated?: string
 }
 
 export type SubtitleNoTime = Omit<Subtitle, 'timestamp'>

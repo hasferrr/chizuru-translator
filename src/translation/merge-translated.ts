@@ -5,8 +5,7 @@ export function mergeTranslated(originals: Subtitle[], translatedList: SubtitleN
   for (let i = 0; i < originals.length; i++) {
     merged.push({
       ...originals[i],
-      content: translatedList[i].translated || '',
-      translated: undefined,
+      content: translatedList[i].content || '',
     })
   }
   return merged

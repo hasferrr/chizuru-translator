@@ -33,7 +33,6 @@ export async function translateSubtitles({
   const subtitles: SubtitleNoTime[] = _subtitles.map(sub => ({
     index: sub.index,
     content: sub.content,
-    translated: '',
   }))
   const userMessage = JSON.stringify(subtitles)
 
@@ -57,9 +56,8 @@ export async function translateSubtitles({
             "properties": {
               "index": { "type": "number" },
               "content": { "type": "string" },
-              "translated": { "type": "string" },
             },
-            "required": ["index", "content", "translated"],
+            "required": ["index", "content"],
             "additionalProperties": false
           }
         }
