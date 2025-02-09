@@ -10,3 +10,10 @@ export function mergeTranslated(originals: Subtitle[], translatedList: SubtitleN
   }
   return merged
 }
+
+export function removeTimestamp(subtitles: Subtitle[]): SubtitleNoTime[] {
+  return subtitles.map(sub => ({
+    index: sub.index,
+    content: sub.content,
+  }))
+}

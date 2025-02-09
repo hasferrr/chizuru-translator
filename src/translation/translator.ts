@@ -18,7 +18,7 @@ interface TranslateSubtitlesParams {
 }
 
 export async function translateSubtitles({
-  subtitles: _subtitles,
+  subtitles,
   sourceLanguage,
   targetLanguage,
   baseURL,
@@ -30,10 +30,6 @@ export async function translateSubtitles({
 }: TranslateSubtitlesParams): Promise<Stream<ChatCompletionChunk> & {
   _request_id?: string | null;
 }> {
-  const subtitles: SubtitleNoTime[] = _subtitles.map(sub => ({
-    index: sub.index,
-    content: sub.content,
-  }))
   const userMessage = JSON.stringify(subtitles)
 
   const stream = await openai(baseURL).chat.completions.create({

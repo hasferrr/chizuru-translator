@@ -2,7 +2,7 @@ import fs from 'fs'
 import type { ChatCompletionMessageParam } from 'openai/resources/index.mjs'
 import type { Subtitle } from '../types/types'
 import { getFullResponse, translateSubtitles } from '../translation/translator'
-import { mergeTranslated } from '../translation/merge-translated'
+import { mergeTranslated, removeTimestamp } from '../utils/subtitle-utils'
 import { getJson } from '../translation/parse-response'
 import { generateSRT } from '../utils/srt/generate'
 import { parseSRT } from '../utils/srt/parse'
@@ -49,7 +49,7 @@ export async function translateSrtContent(options: TranslateSrtContentOptions): 
   const translatedChunks: ReturnType<typeof getJson>[] = []
   const context: ChatCompletionMessageParam[] = []
   for (let i = 0; i < subtitleChunks.length; i++) {
-    const chunk = subtitleChunks[i]
+    const chunk = removeTimestamp(subtitleChunks[i])
     const chunkResponse = await getFullResponse(
       await translateSubtitles({
         subtitles: chunk,
