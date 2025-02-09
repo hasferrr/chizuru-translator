@@ -41,12 +41,7 @@ export function parseASS(fileContent: string): ASSParseOutput {
       const endTime = formatTime(parts[2].trim())
 
       // Extract the text after the 8th comma
-      let textSection = parts.reduce((acc, part, index) => {
-        if (index > 8) {
-          return acc + part
-        }
-        return acc
-      }, '')
+      let textSection = parts.slice(9, parts.length).join(',')
       textSection = textSection.replace('\\N', ' \\n ')
 
       output.push(`${count}\n${startTime} --> ${endTime}\n${textSection}\n\n`)
