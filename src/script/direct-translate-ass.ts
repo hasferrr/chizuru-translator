@@ -4,7 +4,7 @@ import { parseSRT } from "../utils/srt/parse"
 import { translateSrtContent } from "./direct-translate-srt"
 
 interface TranslateAssContentOptions {
-  assRaw: string
+  contentRaw: string
   sourceLanguage: string
   targetLanguage: string
   split: number
@@ -15,11 +15,11 @@ interface TranslateAssContentOptions {
 }
 
 export async function translateAssContent(options: TranslateAssContentOptions): Promise<string> {
-  const parsed = parseASS(options.assRaw)
+  const parsed = parseASS(options.contentRaw)
 
   const translatedSrt = await translateSrtContent({
     ...options,
-    srtRaw: parsed.output.join('\n'),
+    contentRaw: parsed.output.join('\n'),
   })
 
   const merged = mergeASSback(parseSRT(translatedSrt), parsed)

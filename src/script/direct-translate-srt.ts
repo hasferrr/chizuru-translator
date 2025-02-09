@@ -12,7 +12,7 @@ function sleep(ms: number) {
 }
 
 interface TranslateSrtContentOptions {
-  srtRaw: string
+  contentRaw: string
   sourceLanguage: string
   targetLanguage: string
   split: number
@@ -23,7 +23,7 @@ interface TranslateSrtContentOptions {
 }
 
 export async function translateSrtContent(options: TranslateSrtContentOptions): Promise<string> {
-  const { srtRaw, sourceLanguage, targetLanguage, split, baseURL, model, temperature, maxTokens } = options
+  const { contentRaw, sourceLanguage, targetLanguage, split, baseURL, model, temperature, maxTokens } = options
 
   // Log the raw SRT content
   fs.appendFileSync('response.log', '\n'.repeat(5))
@@ -33,7 +33,7 @@ export async function translateSrtContent(options: TranslateSrtContentOptions): 
   fs.appendFileSync('response.log', '\n'.repeat(5))
 
   // Parse SRT content into subtitle objects
-  const subtitles = parseSRT(srtRaw)
+  const subtitles = parseSRT(contentRaw)
 
   // Split the subtitles into chunks of size variable
   const subtitleChunks: Subtitle[][] = []

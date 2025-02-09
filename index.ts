@@ -7,7 +7,7 @@ const model = "accounts/fireworks/models/deepseek-r1"
 
 const srt = async () => {
   const translated = await translateSrtContent({
-    srtRaw: fs.readFileSync("sample.srt", "utf-8"),
+    contentRaw: fs.readFileSync("sample.srt", "utf-8"),
     sourceLanguage: "Japanese",
     targetLanguage: "Indonesian",
     split: 100,
@@ -21,7 +21,7 @@ const srt = async () => {
 
 const ass = async () => {
   const translated = await translateAssContent({
-    assRaw: fs.readFileSync("sample.ass", "utf-8"),
+    contentRaw: fs.readFileSync("sample.ass", "utf-8"),
     sourceLanguage: "Japanese",
     targetLanguage: "Indonesian",
     split: 100,
