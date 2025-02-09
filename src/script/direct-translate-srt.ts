@@ -31,6 +31,9 @@ export async function translateSrtContent(options: TranslateSrtContentOptions): 
   fs.appendFileSync('response.log', '\n')
   fs.appendFileSync('response.log', '='.repeat(100))
   fs.appendFileSync('response.log', '\n'.repeat(5))
+  fs.appendFileSync('json.log', '\n' + '='.repeat(100))
+  fs.appendFileSync('context.log', '\n' + '='.repeat(100))
+  fs.appendFileSync('context.log', '\n' + '[')
 
   // Parse SRT content into subtitle objects
   const subtitles = parseSRT(contentRaw)
@@ -72,7 +75,12 @@ export async function translateSrtContent(options: TranslateSrtContentOptions): 
     })
     await sleep(300)
     fs.appendFileSync('json.log', '\n' + JSON.stringify(json, null, 2))
+    fs.appendFileSync('context.log', '\n' + JSON.stringify(context.at(-2), null, 2) + ',')
+    fs.appendFileSync('context.log', '\n' + JSON.stringify(context.at(-1), null, 2) + ',')
   }
+
+  // Close the array in the log
+  fs.appendFileSync('context.log', '\n' + ']')
 
   // Parse the API response containing translated subtitle data
   const translated = translatedChunks.flat()

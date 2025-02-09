@@ -176,6 +176,7 @@ dist
 
 # Other
 json.log
+context.log
 response.log
 translated.json
 *.srt
