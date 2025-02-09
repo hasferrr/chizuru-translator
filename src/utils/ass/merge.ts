@@ -1,4 +1,4 @@
-import type { ASSParseOutput, Subtitle } from "../../types/types"
+import { DialogueType, type ASSParseOutput, type Subtitle } from "../../types/types"
 
 export function mergeASSback(subtitles: Subtitle[], parsed: ASSParseOutput): string {
   let output = ''
@@ -10,10 +10,20 @@ export function mergeASSback(subtitles: Subtitle[], parsed: ASSParseOutput): str
   }
 
   output += parsed.header.join('\n')
-  output += dialogue.join('\n')
   output += '\n'
-  output += parsed.commentsOnly.join('\n')
-  output += '\n'
+
+  let di = 0
+  let ci = 0
+  for (const type of parsed.order) {
+    if (type === DialogueType.Dialogue) {
+      output += dialogue[di] + '\n'
+      di++
+    } else {
+      output += parsed.commentsOnly[ci] + '\n'
+      ci++
+    }
+  }
+
   output += parsed.footer.join('')
 
   return output

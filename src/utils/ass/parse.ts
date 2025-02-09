@@ -1,4 +1,4 @@
-import type { ASSParseOutput } from "../../types/types"
+import { DialogueType, type ASSParseOutput } from "../../types/types"
 
 function formatTime(timeStr: string): string {
   // Split the time into hours, minutes, seconds, and milliseconds
@@ -17,6 +17,7 @@ export function parseASS(fileContent: string): ASSParseOutput {
   const commentsOnly: string[] = []
   const header: string[] = []
   const footer: string[] = []
+  const order: DialogueType[] = []
 
   let count = 1
   let inHeader = true
@@ -32,6 +33,8 @@ export function parseASS(fileContent: string): ASSParseOutput {
     } else if (inFooter) {
       footer.push(line)
     } else if (line.startsWith('Dialogue')) {
+      order.push(DialogueType.Dialogue)
+
       // Split only on the first 2 commas to get Start and End times
       const parts = line.split(',')
       const startTime = formatTime(parts[1].trim())
@@ -51,6 +54,7 @@ export function parseASS(fileContent: string): ASSParseOutput {
       textOnly.push(textSection)
       count += 1
     } else if (line.startsWith('Comment')) {
+      order.push(DialogueType.Comment)
       commentsOnly.push(line)
     } else if (line.startsWith('[')) {
       inFooter = true
@@ -58,5 +62,5 @@ export function parseASS(fileContent: string): ASSParseOutput {
     }
   }
 
-  return { output, styleOnly, textOnly, commentsOnly, header, footer }
+  return { output, styleOnly, textOnly, commentsOnly, header, footer, order }
 }

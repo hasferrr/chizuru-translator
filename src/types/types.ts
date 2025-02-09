@@ -24,4 +24,10 @@ export interface ASSParseOutput {
   commentsOnly: string[]
   header: string[]
   footer: string[]
+  order: DialogueType[]
+}
+
+export enum DialogueType {
+  Dialogue,
+  Comment,
 }
