@@ -175,6 +175,7 @@ dist
 .DS_Store
 
 # Other
+log/
 json.log
 context.log
 response.log

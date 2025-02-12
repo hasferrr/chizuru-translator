@@ -36,6 +36,7 @@ export interface TranslateContentOptions {
   sourceLanguage: string
   targetLanguage: string
   split: number
+  apiKey?: string
   baseURL: string
   model: string
   temperature: number

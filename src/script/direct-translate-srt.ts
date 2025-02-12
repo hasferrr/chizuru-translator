@@ -1,4 +1,5 @@
 import fs from 'fs'
+import path from 'path'
 import type { ChatCompletionMessageParam } from 'openai/resources/index.mjs'
 import type { Subtitle, TranslateContentOptions } from '../types/types'
 import { getFullResponse, translateSubtitles } from '../translation/translator'
@@ -14,15 +15,12 @@ function sleep(ms: number) {
 export async function translateSrtContent(options: TranslateContentOptions): Promise<string> {
   const { contentRaw, sourceLanguage, targetLanguage, split, apiKey, baseURL, model, temperature, maxTokens } = options
 
-  // Log the raw SRT content
-  fs.appendFileSync('response.log', '\n'.repeat(5))
-  fs.appendFileSync('response.log', '='.repeat(100))
-  fs.appendFileSync('response.log', '\n')
-  fs.appendFileSync('response.log', '='.repeat(100))
-  fs.appendFileSync('response.log', '\n'.repeat(5))
-  fs.appendFileSync('json.log', '\n' + '='.repeat(100))
-  fs.appendFileSync('context.log', '\n' + '='.repeat(100))
-  fs.appendFileSync('context.log', '\n' + '[')
+  // Make sure that the `log` directory exists
+  if (!fs.existsSync('log')) {
+    fs.mkdirSync('log')
+  }
+  fs.appendFileSync(path.join('log', 'response.log'), '\n' + '='.repeat(100))
+  fs.appendFileSync(path.join('log', 'response.log'), '\n')
 
   // Parse SRT content into subtitle objects
   const subtitles = parseSRT(contentRaw)
@@ -63,17 +61,27 @@ export async function translateSrtContent(options: TranslateContentOptions): Pro
       content: JSON.stringify(json)
     })
     await sleep(300)
-    fs.appendFileSync('json.log', '\n' + JSON.stringify(json, null, 2))
-    fs.appendFileSync('context.log', '\n' + JSON.stringify(context.at(-2), null, 2) + ',')
-    fs.appendFileSync('context.log', '\n' + JSON.stringify(context.at(-1), null, 2) + ',')
+
+    if (i === 0) {
+      // Log separator
+      fs.appendFileSync(path.join('log', 'json.log'), '\n' + '='.repeat(100))
+      fs.appendFileSync(path.join('log', 'context.log'), '\n' + '='.repeat(100))
+      fs.appendFileSync(path.join('log', 'context.log'), '\n' + '[')
+    }
+
+    // Log json response and context messages
+    fs.appendFileSync(path.join('log', 'json.log'), '\n' + JSON.stringify(json, null, 2))
+    fs.appendFileSync(path.join('log', 'context.log'), '\n' + JSON.stringify(context.at(-2), null, 2) + ',')
+    fs.appendFileSync(path.join('log', 'context.log'), '\n' + JSON.stringify(context.at(-1), null, 2) + ',')
   }
 
-  // Close the array in the log
-  fs.appendFileSync('context.log', '\n' + ']')
+  // Close the log
+  fs.appendFileSync(path.join('log', 'response.log'), '\n'.repeat(5))
+  fs.appendFileSync(path.join('log', 'context.log'), '\n' + ']')
 
   // Parse the API response containing translated subtitle data
   const translated = translatedChunks.flat()
-  fs.writeFileSync('translated.json', JSON.stringify(translated, null, 2))
+  fs.writeFileSync(path.join('log', 'translated.json'), JSON.stringify(translated, null, 2))
 
   // Generate new SRT content from the translated subtitles list
   const srt = generateSRT(mergeTranslated(subtitles, translated))

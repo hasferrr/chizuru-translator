@@ -1,4 +1,5 @@
 import fs from 'fs'
+import path from 'path'
 import { openai } from '../lib/openai'
 import { systemMessage } from './system-message'
 import type { SubtitleNoTime } from '../types/types'
@@ -77,11 +78,11 @@ export async function getFullResponse(stream: Stream<ChatCompletionChunk> & {
   for await (const chunk of stream) {
     const content = chunk.choices[0]?.delta?.content || ''
     process.stdout.write(content)
-    fs.appendFileSync('response.log', content)
+    fs.appendFileSync(path.join('log', 'response.log'), content)
     fullResponse += content
   }
   process.stdout.write('\n')
-  fs.appendFileSync('response.log', '\n')
+  fs.appendFileSync(path.join('log', 'response.log'), '\n')
 
   return fullResponse
 }
