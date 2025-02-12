@@ -1,6 +1,6 @@
 # Chizuru-Translator
 
-**Chizuru-Translator** is an AI-powered tool designed to translate SRT and ASS subtitle files. It uses custom AI model endpoints to provide high-quality translations that fit your needs. Suitable for videos, films, or anime episodes, it offers a quick and easy solution. Let’s be honest—it’s a lifesaver for leecher moe weebs who just want their subs fast and accurate.
+**Chizuru-Translator** is an AI Subtitle Translator for SRT/ASS subtitle files. It uses custom AI model endpoints to provide high-quality and context-aware translations that fit your needs. Suitable for videos, films, or anime episodes, it offers a quick and easy solution. Let’s be honest—it’s a lifesaver for leecher moe weebs who just want their subs fast and accurate.
 
 ## Setup
 
