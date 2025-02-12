@@ -43,29 +43,11 @@ This approach ensures the delivery of high-quality translations efficiently, mak
 
 Input:
 \`\`\`json
-[
-  {
-    "index": 1,
-    "content": "Hello, world!"
-  },
-  {
-    "index": 2,
-    "content": "This is a test.\\\\nWith multiple lines."
-  }
-]
+[{"index":1,"content":"Hello, world!"},{"index":2,"content":"This is a test.\\\\nWith multiple lines."}]
 \`\`\`
 
 Output (if targetLanguage were Indonesian):
 \`\`\`json
-[
-  {
-    "index": 1,
-    "content": "Halo, dunia!"
-  },
-  {
-    "index": 2,
-    "content": "Ini adalah tes.\\\\nDengan beberapa baris."
-  }
-]
+[{"index":1,"content":"Halo, dunia!"},{"index":2,"content":"Ini adalah tes.\\\\nDengan beberapa baris."}]
 \`\`\`
 `
