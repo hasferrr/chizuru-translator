@@ -1,6 +1,6 @@
 import fs from 'fs'
 import type { ChatCompletionMessageParam } from 'openai/resources/index.mjs'
-import type { Subtitle } from '../types/types'
+import type { Subtitle, TranslateContentOptions } from '../types/types'
 import { getFullResponse, translateSubtitles } from '../translation/translator'
 import { mergeTranslated, removeTimestamp } from '../utils/subtitle-utils'
 import { getJson } from '../translation/parse-response'
@@ -11,19 +11,8 @@ function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-interface TranslateSrtContentOptions {
-  contentRaw: string
-  sourceLanguage: string
-  targetLanguage: string
-  split: number
-  baseURL: string
-  model: string
-  temperature: number
-  maxTokens: number
-}
-
-export async function translateSrtContent(options: TranslateSrtContentOptions): Promise<string> {
-  const { contentRaw, sourceLanguage, targetLanguage, split, baseURL, model, temperature, maxTokens } = options
+export async function translateSrtContent(options: TranslateContentOptions): Promise<string> {
+  const { contentRaw, sourceLanguage, targetLanguage, split, apiKey, baseURL, model, temperature, maxTokens } = options
 
   // Log the raw SRT content
   fs.appendFileSync('response.log', '\n'.repeat(5))
@@ -55,9 +44,9 @@ export async function translateSrtContent(options: TranslateSrtContentOptions): 
         subtitles: chunk,
         sourceLanguage,
         targetLanguage,
+        apiKey,
         baseURL,
         model,
-        strict: true,
         temperature,
         maxTokens,
         contextMessage: context,

@@ -9,9 +9,9 @@ interface TranslateSubtitlesParams {
   subtitles: SubtitleNoTime[]
   sourceLanguage: string
   targetLanguage: string
+  apiKey?: string
   baseURL: string
   model: string
-  strict: boolean
   temperature: number
   maxTokens: number
   contextMessage?: ChatCompletionMessageParam[]
@@ -21,9 +21,9 @@ export async function translateSubtitles({
   subtitles,
   sourceLanguage,
   targetLanguage,
+  apiKey,
   baseURL,
   model,
-  strict,
   temperature,
   maxTokens,
   contextMessage = [],
@@ -32,7 +32,7 @@ export async function translateSubtitles({
 }> {
   const userMessage = JSON.stringify(subtitles)
 
-  const stream = await openai(baseURL).chat.completions.create({
+  const stream = await openai(baseURL, apiKey).chat.completions.create({
     model,
     messages: [
       { role: 'system', content: systemMessage(sourceLanguage, targetLanguage) },
@@ -40,7 +40,7 @@ export async function translateSubtitles({
       { role: 'user', content: userMessage },
     ],
     stream: true,
-    response_format: !strict ? undefined : {
+    response_format: {
       "type": "json_schema",
       "json_schema": {
         "name": "subtitle_format",

@@ -30,3 +30,14 @@ export enum DialogueType {
   Dialogue,
   Comment,
 }
+
+export interface TranslateContentOptions {
+  contentRaw: string
+  sourceLanguage: string
+  targetLanguage: string
+  split: number
+  baseURL: string
+  model: string
+  temperature: number
+  maxTokens: number
+}

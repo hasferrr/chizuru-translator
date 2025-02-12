@@ -1,20 +1,10 @@
+import type { TranslateContentOptions } from "../types/types"
 import { mergeASSback } from "../utils/ass/merge"
 import { parseASS } from "../utils/ass/parse"
 import { parseSRT } from "../utils/srt/parse"
 import { translateSrtContent } from "./direct-translate-srt"
 
-interface TranslateAssContentOptions {
-  contentRaw: string
-  sourceLanguage: string
-  targetLanguage: string
-  split: number
-  baseURL: string
-  model: string
-  temperature: number
-  maxTokens: number
-}
-
-export async function translateAssContent(options: TranslateAssContentOptions): Promise<string> {
+export async function translateAssContent(options: TranslateContentOptions): Promise<string> {
   const parsed = parseASS(options.contentRaw)
 
   const translatedSrt = await translateSrtContent({
