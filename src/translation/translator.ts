@@ -5,6 +5,16 @@ import { systemMessage } from './system-message'
 import type { SubtitleNoTime } from '../types/types'
 import type { ChatCompletionChunk, ChatCompletionMessageParam } from 'openai/resources/index.mjs'
 import type { Stream } from 'openai/streaming.mjs'
+import { z } from 'zod'
+import { zodResponseFormat } from "openai/helpers/zod"
+
+const SubtitleSchema = z.array(
+  z.object({
+    index: z.number(),
+    content: z.string(),
+    translated: z.string(),
+  })
+)
 
 interface TranslateSubtitlesParams {
   subtitles: SubtitleNoTime[]
@@ -41,26 +51,7 @@ export async function translateSubtitles({
       { role: 'user', content: userMessage },
     ],
     stream: true,
-    response_format: {
-      "type": "json_schema",
-      "json_schema": {
-        "name": "subtitle_format",
-        "strict": true,
-        "schema": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "index": { "type": "number" },
-              "content": { "type": "string" },
-              "translated": { "type": "string" },
-            },
-            "required": ["index", "content", "translated"],
-            "additionalProperties": false
-          }
-        }
-      }
-    },
+    response_format: zodResponseFormat(SubtitleSchema, 'subtitle_schema'),
     temperature: Math.min(Math.max(temperature, 0), 1.3),
     max_tokens: Math.max(maxTokens, 1),
   })
