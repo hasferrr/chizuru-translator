@@ -13,9 +13,9 @@ const main = async () => {
     apiKey,
     baseURL,
     model,
-    split: 200,
-    temperature: 0.7,
-    maxTokens: 20000,
+    split: 500,
+    temperature: 1,
+    maxTokens: 100000,
   })
   fs.writeFileSync("translated.ass", translated)
 }

@@ -1,4 +1,4 @@
-import type { SubtitleNoTime } from "../types/types"
+import type { SubtitleNoTime, SubtitleNoTimeTranslated } from "../types/types"
 
 function keepOnlyWrapped(text: string, a: string, b: string): string {
   const startA = text.indexOf(a)
@@ -28,5 +28,9 @@ export function getJson(response: string): SubtitleNoTime[] {
     || keepOnlyWrapped(removedThink, b, b).replaceAll(b, '')
     || removedThink.replaceAll(a, '').replaceAll(b, '')
     || '[]'
-  return JSON.parse(jsonString)
+  const subtitles = JSON.parse(jsonString) as SubtitleNoTimeTranslated[]
+  return subtitles.map((sub) => ({
+    index: sub.index,
+    content: sub.translated || '',
+  }))
 }

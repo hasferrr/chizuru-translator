@@ -53,8 +53,9 @@ export async function translateSubtitles({
             "properties": {
               "index": { "type": "number" },
               "content": { "type": "string" },
+              "translated": { "type": "string" },
             },
-            "required": ["index", "content"],
+            "required": ["index", "content", "translated"],
             "additionalProperties": false
           }
         }

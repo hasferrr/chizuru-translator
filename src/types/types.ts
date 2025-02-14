@@ -16,6 +16,10 @@ export interface Subtitle {
 
 export type SubtitleNoTime = Omit<Subtitle, 'timestamp'>
 
+export type SubtitleNoTimeTranslated = SubtitleNoTime & {
+  translated: string
+}
+
 export interface ASSParseOutput {
   output: string[]
   styleOnly: string[]
