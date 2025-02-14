@@ -1,4 +1,4 @@
-import type { SubtitleNoTime, SubtitleNoTimeTranslated } from "../../types/types"
+import type { SubtitleNoTime, SubtitleNoTimeTranslated } from "../types/types"
 
 function keepOnlyWrapped(text: string, a: string, b: string): string {
   const startA = text.indexOf(a)
@@ -33,4 +33,9 @@ export function getJson(response: string): SubtitleNoTime[] {
     index: sub.index,
     content: sub.translated || '',
   }))
+}
+
+export function getContent(response: string): string {
+  const removedThink = removeWrapped(response, '<think>', '</think>')
+  return removedThink.trim()
 }

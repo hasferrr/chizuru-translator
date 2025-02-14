@@ -4,7 +4,7 @@ import type { ChatCompletionMessageParam } from 'openai/resources/index.mjs'
 import type { Subtitle, TranslateContentOptions } from '../types/types'
 import { getFullResponse, translateSubtitles } from '../lib/translation/translator'
 import { mergeTranslated, removeTimestamp } from '../utils/subtitle-utils'
-import { getJson } from '../lib/translation/parse-response'
+import { getJson } from '../utils/parse-response'
 import { generateSRT } from '../utils/srt/generate'
 import { parseSRT } from '../utils/srt/parse'
 
