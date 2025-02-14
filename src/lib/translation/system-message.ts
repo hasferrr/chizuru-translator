@@ -1,4 +1,4 @@
-export const systemMessage = (
+export const systemMessageTranslation = (
   sourceLanguage: string,
   targetLanguage: string,
 ) => `**Role and Expertise:**

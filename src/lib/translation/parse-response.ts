@@ -1,4 +1,4 @@
-import type { SubtitleNoTime, SubtitleNoTimeTranslated } from "../types/types"
+import type { SubtitleNoTime, SubtitleNoTimeTranslated } from "../../types/types"
 
 function keepOnlyWrapped(text: string, a: string, b: string): string {
   const startA = text.indexOf(a)

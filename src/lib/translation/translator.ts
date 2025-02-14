@@ -1,8 +1,8 @@
 import fs from 'fs'
 import path from 'path'
-import { openai } from '../lib/openai'
-import { systemMessage } from './system-message'
-import type { SubtitleNoTime } from '../types/types'
+import { openai } from '../openai'
+import { systemMessageTranslation } from './system-message'
+import type { SubtitleNoTime } from '../../types/types'
 import type { ChatCompletionChunk, ChatCompletionMessageParam } from 'openai/resources/index.mjs'
 import type { Stream } from 'openai/streaming.mjs'
 import { z } from 'zod'
@@ -46,7 +46,7 @@ export async function translateSubtitles({
   const stream = await openai(baseURL, apiKey).chat.completions.create({
     model,
     messages: [
-      { role: 'system', content: systemMessage(sourceLanguage, targetLanguage) },
+      { role: 'system', content: systemMessageTranslation(sourceLanguage, targetLanguage) },
       ...contextMessage,
       { role: 'user', content: userMessage },
     ],
