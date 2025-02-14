@@ -182,3 +182,4 @@ response.log
 translated.json
 *.srt
 *.ass
+context-extracted/

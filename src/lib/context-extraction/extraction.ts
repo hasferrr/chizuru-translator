@@ -2,15 +2,10 @@ import { systemMessageContextExtraction } from './system-message'
 import { openai } from '../openai'
 import type { ChatCompletionChunk } from 'openai/resources/index.mjs'
 import type { Stream } from 'openai/streaming.mjs'
-
-interface InputSubtitle {
-  episode: number
-  subtitle: string
-  previousContext: string
-}
+import type { ContextExtractionInput } from '../../types/types'
 
 interface ExtractContextParams {
-  input: InputSubtitle
+  input: ContextExtractionInput
   apiKey?: string
   baseURL: string
   model: string

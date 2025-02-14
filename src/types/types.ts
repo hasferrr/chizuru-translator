@@ -46,3 +46,9 @@ export interface TranslateContentOptions {
   temperature: number
   maxTokens: number
 }
+
+export interface ContextExtractionInput {
+  episode: number
+  subtitle: string
+  previous_context: string
+}
