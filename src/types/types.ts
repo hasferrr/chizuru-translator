@@ -35,8 +35,8 @@ export enum DialogueType {
   Comment,
 }
 
-export interface TranslateContentOptions {
-  contentRaw: string
+export interface TranslateSubtitleOption {
+  subtitles: Subtitle[]
   sourceLanguage: string
   targetLanguage: string
   contextDocument: string
@@ -46,6 +46,10 @@ export interface TranslateContentOptions {
   model: string
   temperature: number
   maxTokens: number
+}
+
+export type TranslateRawContentOptions = Omit<TranslateSubtitleOption, "subtitles"> & {
+  contentRaw: string
 }
 
 export interface ContextExtractionInput {

@@ -1,34 +1,84 @@
-import type { TranslateContentOptions } from "../types/types"
-import { translateAssContent } from "./direct-translate-ass"
-import { translateSrtContent } from "./direct-translate-srt"
+import fs from 'fs'
+import path from 'path'
+import type { ChatCompletionMessageParam } from 'openai/resources/index.mjs'
+import type { Subtitle, TranslateSubtitleOption } from '../types/types'
+import { getFullResponse, translateSubtitles } from '../lib/translation/translator'
+import { mergeTranslated, removeTimestamp } from '../utils/subtitle-utils'
+import { getJson } from '../utils/parse-response'
 
-export async function translateContent(format: 'ass' | 'srt', options: TranslateContentOptions): Promise<string> {
-  const { contentRaw } = options
+export async function translateSubtitle(options: TranslateSubtitleOption): Promise<Subtitle[]> {
+  const { subtitles, sourceLanguage, targetLanguage, contextDocument, split, apiKey, baseURL, model, temperature, maxTokens } = options
 
-  // Validate content format
-  if (format === 'ass' && !isASS(contentRaw)) {
-    throw new Error('Content does not match ASS format')
-  } else if (format === 'srt' && !isSRT(contentRaw)) {
-    throw new Error('Content does not match SRT format')
+  // Make sure that the `log` directory exists
+  if (!fs.existsSync('log')) {
+    fs.mkdirSync('log')
+  }
+  fs.appendFileSync(path.join('log', 'response.log'), '\n' + '='.repeat(100))
+  fs.appendFileSync(path.join('log', 'response.log'), '\n')
+
+  // Split the subtitles into chunks of size variable
+  const subtitleChunks: Subtitle[][] = []
+  const size = split
+  for (let i = 0; i < subtitles.length; i += size) {
+    subtitleChunks.push(subtitles.slice(i, i + size))
   }
 
-  // Delegate to the appropriate translation function
-  if (format === 'ass') {
-    return translateAssContent(options)
-  } else if (format === 'srt') {
-    return translateSrtContent(options)
-  } else {
-    throw new Error('Unsupported format')
+  // Translate each chunk of subtitles from Japanese to Indonesian
+  const translatedChunks: ReturnType<typeof getJson>[] = []
+  const context: ChatCompletionMessageParam[] = []
+  for (let i = 0; i < subtitleChunks.length; i++) {
+    const chunk = removeTimestamp(subtitleChunks[i])
+    const chunkResponse = await getFullResponse(
+      await translateSubtitles({
+        subtitles: chunk,
+        sourceLanguage,
+        targetLanguage,
+        contextDocument,
+        apiKey,
+        baseURL,
+        model,
+        temperature,
+        maxTokens,
+        contextMessage: context,
+      })
+    )
+    const json = getJson(chunkResponse)
+    translatedChunks.push(json)
+    context.push({
+      role: 'user',
+      content: JSON.stringify(chunk)
+    })
+    context.push({
+      role: 'assistant',
+      content: JSON.stringify(json)
+    })
+    await sleep(300)
+
+    if (i === 0) {
+      // Log separator
+      fs.appendFileSync(path.join('log', 'json.log'), '\n' + '='.repeat(100))
+      fs.appendFileSync(path.join('log', 'context.log'), '\n' + '='.repeat(100))
+      fs.appendFileSync(path.join('log', 'context.log'), '\n' + '[')
+    }
+
+    // Log json response and context messages
+    fs.appendFileSync(path.join('log', 'json.log'), '\n' + JSON.stringify(json, null, 2))
+    fs.appendFileSync(path.join('log', 'context.log'), '\n' + JSON.stringify(context.at(-2), null, 2) + ',')
+    fs.appendFileSync(path.join('log', 'context.log'), '\n' + JSON.stringify(context.at(-1), null, 2) + ',')
   }
+
+  // Close the log
+  fs.appendFileSync(path.join('log', 'response.log'), '\n'.repeat(5))
+  fs.appendFileSync(path.join('log', 'context.log'), '\n' + ']')
+
+  // Parse the API response containing translated subtitle data
+  const translated = translatedChunks.flat()
+  fs.writeFileSync(path.join('log', 'translated.json'), JSON.stringify(translated, null, 2))
+
+  // Merge the translated subtitles with the original subtitles to preserve timing information
+  return mergeTranslated(subtitles, translated)
 }
 
-function isASS(content: string): boolean {
-  return content.trim().startsWith('[Script Info]')
-}
-
-function isSRT(content: string): boolean {
-  const lines = content.trim().split('\n', 2)
-  const firstLine = lines[0]
-  const secondLine = lines[1]
-  return !isNaN(Number(firstLine)) && secondLine.includes(' --> ')
+function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms))
 }
