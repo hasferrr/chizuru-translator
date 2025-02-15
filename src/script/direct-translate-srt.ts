@@ -13,7 +13,7 @@ function sleep(ms: number) {
 }
 
 export async function translateSrtContent(options: TranslateContentOptions): Promise<string> {
-  const { contentRaw, sourceLanguage, targetLanguage, split, apiKey, baseURL, model, temperature, maxTokens } = options
+  const { contentRaw, sourceLanguage, targetLanguage, contextDocument, split, apiKey, baseURL, model, temperature, maxTokens } = options
 
   // Make sure that the `log` directory exists
   if (!fs.existsSync('log')) {
@@ -42,6 +42,7 @@ export async function translateSrtContent(options: TranslateContentOptions): Pro
         subtitles: chunk,
         sourceLanguage,
         targetLanguage,
+        contextDocument,
         apiKey,
         baseURL,
         model,

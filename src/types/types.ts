@@ -39,6 +39,7 @@ export interface TranslateContentOptions {
   contentRaw: string
   sourceLanguage: string
   targetLanguage: string
+  contextDocument: string
   split: number
   apiKey?: string
   baseURL: string
