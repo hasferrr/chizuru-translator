@@ -18,8 +18,17 @@
 
 3. Run the project:
 
+   As a Script:
+
    ```bash
-   bun run index.ts
+   bun run index.ts               # Translate subtitle
+   bun run extract-context.ts     # Extract context from subtitle
+   ```
+
+   As an API Server:
+
+   ```bash
+   bun dev
    ```
 
 This project was created using `bun init` in bun v1.2.2. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
