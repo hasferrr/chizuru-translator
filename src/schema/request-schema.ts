@@ -15,7 +15,7 @@ const messageSchema = z.object({
   content: z.array(contentItemSchema),
 })
 
-export const reqBodySchema = z.object({
+export const translationBodySchema = z.object({
   subtitles: z.array(subtitleSchema),
   sourceLanguage: z.string(),
   targetLanguage: z.string(),
@@ -26,4 +26,16 @@ export const reqBodySchema = z.object({
   temperature: z.number(),
   maxTokens: z.number(),
   contextMessage: z.array(messageSchema),
+})
+
+export const contextExtractionBodySchema = z.object({
+  input: z.object({
+    episode: z.number().int(),
+    subtitle: z.string(),
+    previous_context: z.string(),
+  }),
+  apiKey: z.string(),
+  baseURL: z.string().url(),
+  model: z.string(),
+  maxTokens: z.number().int().positive(),
 })
