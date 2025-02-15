@@ -3,16 +3,21 @@ import cors from 'cors'
 import { z, ZodError } from 'zod'
 import type { ChatCompletionChunk } from 'openai/resources/index.mjs'
 import type { Stream } from 'openai/streaming.mjs'
+import { extractTokens } from './middleware'
 import { extractContext } from './lib/context-extraction/extraction'
 import { translateSubtitles } from './lib/translation/translator'
 import { contextExtractionBodySchema, translationBodySchema } from './schema/request-schema'
 
 const app = express()
 
-app.use(cors())
+app.use(cors({
+  origin: ['*'],
+  methods: ['POST'],
+  allowedHeaders: ['Authorization', 'Content-Type']
+}))
 app.use(express.json())
 
-app.post('/api/stream/translate', async (req: Request<{}, {}, z.infer<typeof translationBodySchema>>, res: Response) => {
+app.post('/api/stream/translate', extractTokens, async (req: Request<{}, {}, z.infer<typeof translationBodySchema>>, res: Response) => {
   try {
     console.log('Handling translation...')
 
@@ -23,7 +28,6 @@ app.post('/api/stream/translate', async (req: Request<{}, {}, z.infer<typeof tra
       sourceLanguage,
       targetLanguage,
       contextDocument,
-      apiKey,
       baseURL,
       model,
       temperature,
@@ -37,7 +41,7 @@ app.post('/api/stream/translate', async (req: Request<{}, {}, z.infer<typeof tra
       sourceLanguage,
       targetLanguage,
       contextDocument,
-      apiKey,
+      apiKey: req.apiKey,
       baseURL,
       model,
       temperature,
@@ -69,7 +73,7 @@ app.post('/api/stream/translate', async (req: Request<{}, {}, z.infer<typeof tra
   }
 })
 
-app.post('/api/stream/extract-context', async (req: Request<{}, {}, z.infer<typeof contextExtractionBodySchema>>, res: Response) => {
+app.post('/api/stream/extract-context', extractTokens, async (req: Request<{}, {}, z.infer<typeof contextExtractionBodySchema>>, res: Response) => {
   try {
     console.log('Handling context extraction...')
 
@@ -77,7 +81,6 @@ app.post('/api/stream/extract-context', async (req: Request<{}, {}, z.infer<type
     const validatedRequest = contextExtractionBodySchema.parse(req.body)
     const {
       input,
-      apiKey,
       baseURL,
       model,
       maxTokens,
@@ -86,7 +89,7 @@ app.post('/api/stream/extract-context', async (req: Request<{}, {}, z.infer<type
     // Initiate the extraction stream
     const stream = await extractContext({
       input,
-      apiKey,
+      apiKey: req.apiKey,
       baseURL,
       model,
       maxTokens,
