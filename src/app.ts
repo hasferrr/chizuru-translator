@@ -2,7 +2,7 @@ import express, { type Request, type Response } from 'express'
 import cors from 'cors'
 import { z, ZodError } from 'zod'
 import { translateSubtitles } from './lib/translation/translator'
-import { reqBodySchema, subtitlesSchema } from './schema/api-zod'
+import { reqBodySchema } from './schema/request-schema'
 
 const app = express()
 
@@ -25,14 +25,12 @@ app.post('/stream', async (req: Request<{}, {}, z.infer<typeof reqBodySchema>>, 
       model,
       temperature,
       maxTokens,
+      contextMessage,
     } = validatedRequest
-
-    // Parse and validate the subtitles
-    const parsedSubtitle = subtitlesSchema.parse(subtitles)
 
     // Initiate the translation stream
     const stream = await translateSubtitles({
-      subtitles: parsedSubtitle.map(({ index, content }) => ({ index, content })),
+      subtitles: subtitles.map(({ index, content }) => ({ index, content })),
       sourceLanguage,
       targetLanguage,
       contextDocument,
@@ -41,7 +39,10 @@ app.post('/stream', async (req: Request<{}, {}, z.infer<typeof reqBodySchema>>, 
       model,
       temperature,
       maxTokens,
-      contextMessage: [], // TODO
+      contextMessage: contextMessage.map((message) => ({
+        role: message.role,
+        content: JSON.stringify(message.content),
+      })),
     })
 
     // Set streaming headers

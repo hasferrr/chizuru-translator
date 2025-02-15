@@ -1,24 +1,22 @@
 import { z } from "zod"
 
-export const subtitlesSchema = z.array(
-  z.object({
-    index: z.number(),
-    content: z.string(),
-  })
-)
+const subtitleSchema = z.object({
+  index: z.number(),
+  content: z.string(),
+})
 
 const contentItemSchema = z.object({
   index: z.number(),
   content: z.string(),
 })
 
-export const messageSchema = z.object({
+const messageSchema = z.object({
   role: z.union([z.literal('user'), z.literal('assistant')]),
   content: z.array(contentItemSchema),
 })
 
 export const reqBodySchema = z.object({
-  subtitles: subtitlesSchema,
+  subtitles: z.array(subtitleSchema),
   sourceLanguage: z.string(),
   targetLanguage: z.string(),
   contextDocument: z.string(),
@@ -27,5 +25,5 @@ export const reqBodySchema = z.object({
   model: z.string(),
   temperature: z.number(),
   maxTokens: z.number(),
-  // contextMessage: messageSchema.optional(), // TODO
+  contextMessage: z.array(messageSchema),
 })
