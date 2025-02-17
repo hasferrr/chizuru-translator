@@ -36,6 +36,7 @@ export function parseSRT(fileContent: string): Subtitle[] {
   }
 
   if (currentSubtitle.index !== undefined) {
+    currentSubtitle.actor = ""
     subtitles.push(currentSubtitle as Subtitle)
   }
 

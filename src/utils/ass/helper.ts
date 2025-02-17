@@ -60,6 +60,7 @@ export function convertSubtitleEventsToSubtitles(events: SubtitleEvent[]): Subti
           start: parseTimestamp(event.start),
           end: parseTimestamp(event.end),
         },
+        actor: event.name || "",
         content: event.text,
       }
       subtitles.push(subtitle)

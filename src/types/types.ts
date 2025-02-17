@@ -14,13 +14,21 @@ export interface Subtitle {
     start: Timestamp
     end: Timestamp
   }
+  actor: string
   content: string
 }
 
 export type SubtitleNoTime = Omit<Subtitle, 'timestamp'>
 
-export type SubtitleNoTimeTranslated = SubtitleNoTime & {
+export interface SubtitleNoTimeTranslated {
+  index: number
+  content: string
   translated: string
+}
+
+export interface SubtitleMinimal {
+  index: number
+  content: string
 }
 
 export interface ASSParseOutput {

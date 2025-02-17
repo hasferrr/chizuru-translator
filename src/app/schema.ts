@@ -2,6 +2,7 @@ import { z } from "zod"
 
 const subtitleSchema = z.object({
   index: z.number(),
+  actor: z.string(),
   content: z.string(),
 })
 

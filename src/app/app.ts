@@ -36,7 +36,7 @@ app.post('/api/stream/translate', extractTokens, async (req: Request<{}, {}, z.i
 
     // Initiate the translation stream
     const stream = await translateSubtitles({
-      subtitles: subtitles.map(({ index, content }) => ({ index, content })),
+      subtitles: subtitles.map(({ index, actor, content }) => ({ index, actor, content })),
       sourceLanguage,
       targetLanguage,
       contextDocument,
