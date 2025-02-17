@@ -2,10 +2,10 @@ import express, { type Request, type Response } from 'express'
 import cors from 'cors'
 import { z, ZodError } from 'zod'
 import { extractTokens } from './middleware'
-import { extractContext } from './lib/context-extraction/extraction'
-import { translateSubtitles } from './lib/translation/translator'
-import { contextExtractionBodySchema, translationBodySchema } from './schema/request-schema'
-import type { StreamChatCompletion } from './types/types'
+import { extractContext } from '../lib/context-extraction/extraction'
+import { translateSubtitles } from '../lib/translation/translator'
+import { contextExtractionBodySchema, translationBodySchema } from './schema'
+import type { StreamChatCompletion } from '../types/types'
 
 const app = express()
 
