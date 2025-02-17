@@ -2,9 +2,10 @@ import fs from 'fs'
 import path from 'path'
 import type { ChatCompletionMessageParam } from 'openai/resources/index.mjs'
 import type { Subtitle, TranslateSubtitleOption } from '../types/types'
-import { getFullResponse, translateSubtitles } from '../lib/translation/translator'
+import { translateSubtitles } from '../lib/translation/translator'
 import { mergeTranslated, removeTimestamp } from '../utils/subtitle-utils'
 import { getJson } from '../utils/parse-response'
+import { getFullResponse } from '../utils/stream-response'
 
 export async function translateSubtitle(options: TranslateSubtitleOption): Promise<Subtitle[]> {
   const { subtitles, sourceLanguage, targetLanguage, contextDocument, split, apiKey, baseURL, model, temperature, maxTokens } = options

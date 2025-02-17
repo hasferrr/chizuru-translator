@@ -1,10 +1,7 @@
-import fs from 'fs'
-import path from 'path'
 import { openai } from '../openai'
 import { systemMessageTranslation } from './system-message'
-import type { SubtitleNoTime } from '../../types/types'
-import type { ChatCompletionChunk, ChatCompletionMessageParam } from 'openai/resources/index.mjs'
-import type { Stream } from 'openai/streaming.mjs'
+import type { StreamChatCompletion, SubtitleNoTime } from '../../types/types'
+import type { ChatCompletionMessageParam } from 'openai/resources/index.mjs'
 import { z } from 'zod'
 import { zodResponseFormat } from "openai/helpers/zod"
 
@@ -40,9 +37,7 @@ export async function translateSubtitles({
   temperature,
   maxTokens,
   contextMessage = [],
-}: TranslateSubtitlesParams): Promise<Stream<ChatCompletionChunk> & {
-  _request_id?: string | null;
-}> {
+}: TranslateSubtitlesParams): Promise<StreamChatCompletion> {
   const systemMessage = systemMessageTranslation(sourceLanguage, targetLanguage, contextDocument)
   const userMessage = JSON.stringify(subtitles)
 
@@ -60,24 +55,4 @@ export async function translateSubtitles({
   })
 
   return stream
-}
-
-export async function getFullResponse(stream: Stream<ChatCompletionChunk> & {
-  _request_id?: string | null;
-}): Promise<string> {
-  console.log('='.repeat(80))
-  console.log('Getting full response...')
-  console.log('='.repeat(80))
-
-  let fullResponse = ''
-  for await (const chunk of stream) {
-    const content = chunk.choices[0]?.delta?.content || ''
-    process.stdout.write(content)
-    fs.appendFileSync(path.join('log', 'response.log'), content)
-    fullResponse += content
-  }
-  process.stdout.write('\n')
-  fs.appendFileSync(path.join('log', 'response.log'), '\n')
-
-  return fullResponse
 }

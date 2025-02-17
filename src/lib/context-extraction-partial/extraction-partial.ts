@@ -1,12 +1,9 @@
-import fs from 'fs'
-import path from 'path'
 import { z } from 'zod'
 import { zodResponseFormat } from 'openai/helpers/zod'
-import type { ChatCompletionChunk } from 'openai/resources/index.mjs'
-import type { Stream } from 'openai/streaming.mjs'
 import { openai } from '../openai'
 import { BatchExtractionInputSchema, BatchExtractionOutputSchema, type BatchExtractionOutput } from './context-schema'
 import { contextExtractionPartialSystemMessage } from './system-message'
+import type { StreamChatCompletion } from '../../types/types'
 
 interface ExtractContextParams {
   input: z.infer<typeof BatchExtractionInputSchema>
@@ -22,9 +19,7 @@ export async function extractContextPartialJson({
   baseURL,
   model,
   maxTokens,
-}: ExtractContextParams): Promise<Stream<ChatCompletionChunk> & {
-  _request_id?: string | null;
-}> {
+}: ExtractContextParams): Promise<StreamChatCompletion> {
   const inputJsonString = JSON.stringify(input)
 
   const stream = await openai(baseURL, apiKey).chat.completions.create({
@@ -40,26 +35,6 @@ export async function extractContextPartialJson({
   })
 
   return stream
-}
-
-export async function getFullResponse(stream: Stream<ChatCompletionChunk> & {
-  _request_id?: string | null;
-}): Promise<string> {
-  console.log('='.repeat(80))
-  console.log('Extracting context...')
-  console.log('='.repeat(80))
-
-  let fullResponse = ''
-  for await (const chunk of stream) {
-    const content = chunk.choices[0]?.delta?.content || ''
-    process.stdout.write(content)
-    fs.appendFileSync(path.join('log', 'response.log'), content)
-    fullResponse += content
-  }
-  process.stdout.write('\n')
-  fs.appendFileSync(path.join('log', 'response.log'), '\n')
-
-  return fullResponse
 }
 
 export function parseContextExtractionJSON(response: string): BatchExtractionOutput {

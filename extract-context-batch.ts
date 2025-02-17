@@ -1,8 +1,9 @@
 import { promises as fs } from 'fs'
 import * as path from 'path'
 import { parseSRT } from './src/utils/srt/parse'
-import { extractContextPartialJson, getFullResponse, parseContextExtractionJSON } from './src/lib/context-extraction-partial/extraction-partial'
+import { extractContextPartialJson, parseContextExtractionJSON } from './src/lib/context-extraction-partial/extraction-partial'
 import { ContextManager } from './src/lib/context-extraction-partial/context-manager'
+import { getFullResponse } from './src/utils/stream-response'
 
 // --- Configuration ---
 const API_KEY = process.env.OPENAI_API_KEY

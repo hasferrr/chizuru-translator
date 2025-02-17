@@ -1,3 +1,6 @@
+import type { ChatCompletionChunk } from 'openai/resources/index.mjs'
+import type { Stream } from 'openai/streaming.mjs'
+
 export interface Timestamp {
   h: number
   m: number
@@ -56,4 +59,8 @@ export interface ContextExtractionInput {
   episode: number
   subtitle: string
   previous_context: string
+}
+
+export type StreamChatCompletion = Stream<ChatCompletionChunk> & {
+  _request_id?: string | null;
 }

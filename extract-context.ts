@@ -1,10 +1,11 @@
 import fs from 'fs'
 import path from 'path'
-import { extractContext, getFullResponse } from './src/lib/context-extraction/extraction'
+import { extractContext } from './src/lib/context-extraction/extraction'
 import { parseSRT } from './src/utils/srt/parse'
 import { parseASS } from './src/utils/ass/parse'
 import type { ContextExtractionInput } from './src/types/types'
 import { getContent } from './src/utils/parse-response'
+import { getFullResponse } from './src/utils/stream-response'
 
 const API_KEY = process.env.OPENAI_API_KEY
 const BASE_URL = "https://api.fireworks.ai/inference/v1"

@@ -1,8 +1,6 @@
 import { systemMessageContextExtraction } from './system-message'
 import { openai } from '../openai'
-import type { ChatCompletionChunk } from 'openai/resources/index.mjs'
-import type { Stream } from 'openai/streaming.mjs'
-import type { ContextExtractionInput } from '../../types/types'
+import type { ContextExtractionInput, StreamChatCompletion } from '../../types/types'
 
 interface ExtractContextParams {
   input: ContextExtractionInput
@@ -18,9 +16,7 @@ export async function extractContext({
   baseURL,
   model,
   maxTokens,
-}: ExtractContextParams): Promise<Stream<ChatCompletionChunk> & {
-  _request_id?: string | null;
-}> {
+}: ExtractContextParams): Promise<StreamChatCompletion> {
   const inputJsonString = JSON.stringify(input)
 
   const stream = await openai(baseURL, apiKey).chat.completions.create({
@@ -35,22 +31,4 @@ export async function extractContext({
   })
 
   return stream
-}
-
-export async function getFullResponse(stream: Stream<ChatCompletionChunk> & {
-  _request_id?: string | null;
-}): Promise<string> {
-  console.log('='.repeat(80))
-  console.log('Extracting context...')
-  console.log('='.repeat(80))
-
-  let fullResponse = ''
-  for await (const chunk of stream) {
-    const content = chunk.choices[0]?.delta?.content || ''
-    process.stdout.write(content)
-    fullResponse += content
-  }
-  process.stdout.write('\n')
-
-  return fullResponse
 }
