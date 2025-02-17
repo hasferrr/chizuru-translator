@@ -1,7 +1,7 @@
-import express, { type Request, type Response } from 'express'
+import express, { type NextFunction, type Request, type Response } from 'express'
 import cors from 'cors'
-import { z, ZodError } from 'zod'
-import { extractTokens } from './middleware'
+import { z } from 'zod'
+import { errorHandler, extractTokens } from './middleware'
 import { extractContext } from '../lib/context-extraction/extraction'
 import { translateSubtitles } from '../lib/translation/translator'
 import { contextExtractionBodySchema, translationBodySchema } from './schema'
@@ -16,7 +16,7 @@ app.use(cors({
 }))
 app.use(express.json())
 
-app.post('/api/stream/translate', extractTokens, async (req: Request<{}, {}, z.infer<typeof translationBodySchema>>, res: Response) => {
+app.post('/api/stream/translate', extractTokens, async (req: Request<{}, {}, z.infer<typeof translationBodySchema>>, res: Response, next: NextFunction) => {
   try {
     console.log('Handling translation...')
 
@@ -55,24 +55,11 @@ app.post('/api/stream/translate', extractTokens, async (req: Request<{}, {}, z.i
     res.end()
 
   } catch (error) {
-    console.error('Error:', error)
-
-    // Handle specific error types
-    if (error instanceof ZodError) {
-      res.status(400).send({ error: 'Validation failed', details: error.errors })
-    } else if (error instanceof Error && error.name === 'AbortError') {
-      console.log('OpenAI stream aborted')
-    } else if (error instanceof Error) {
-      res.status(500).send({ error: error.message || 'Internal server error' })
-    } else {
-      res.status(500).send({ error: 'Internal server error' })
-    }
-
-    res.end()
+    next(error)
   }
 })
 
-app.post('/api/stream/extract-context', extractTokens, async (req: Request<{}, {}, z.infer<typeof contextExtractionBodySchema>>, res: Response) => {
+app.post('/api/stream/extract-context', extractTokens, async (req: Request<{}, {}, z.infer<typeof contextExtractionBodySchema>>, res: Response, next: NextFunction) => {
   try {
     console.log('Handling context extraction...')
 
@@ -98,22 +85,11 @@ app.post('/api/stream/extract-context', extractTokens, async (req: Request<{}, {
     res.end()
 
   } catch (error) {
-    console.error('Error:', error)
-
-    // Handle specific error types
-    if (error instanceof ZodError) {
-      res.status(400).send({ error: 'Validation failed', details: error.errors })
-    } else if (error instanceof Error && error.name === 'AbortError') {
-      console.log('OpenAI stream aborted')
-    } else if (error instanceof Error) {
-      res.status(500).send({ error: error.message || 'Internal server error' })
-    } else {
-      res.status(500).send({ error: 'Internal server error' })
-    }
-
-    res.end()
+    next(error)
   }
 })
+
+app.use(errorHandler)
 
 async function handleStreaming(
   stream: StreamChatCompletion,
