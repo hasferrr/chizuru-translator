@@ -6,31 +6,29 @@ import { parseASS } from './src/utils/ass/parse'
 import type { ContextExtractionInput } from './src/types/types'
 import { getContent } from './src/utils/response-utils'
 import { getFullResponse } from './src/utils/stream-response'
+import { removeTimestamp } from './src/utils/subtitle-utils'
 
 const API_KEY = process.env.OPENAI_API_KEY
 const BASE_URL = "https://api.fireworks.ai/inference/v1"
 const MODEL = "accounts/fireworks/models/deepseek-v3"
 const MAX_TOKENS = 40_000
-const INPUT_FILE = 'episode_10.ass'
+const INPUT_FILE = 'sample.ass'
 const CONTEXT_DIR = './context-extracted'
-const OUTPUT_FILE = path.join(CONTEXT_DIR, 'context_episode_10.txt')
+const OUTPUT_FILE = path.join(CONTEXT_DIR, 'context_sample.txt')
 
 async function processSubtitles() {
   const content = fs.readFileSync(INPUT_FILE, 'utf-8')
 
-  let subtitle = ''
-  const parsedSubtitles = content.startsWith('[Script Info]')
-    ? parseASS(content).subtitles
-    : parseSRT(content)
-  for (const sub of parsedSubtitles) {
-    subtitle += `${sub.content}\n`
-  }
+  const subtitles = removeTimestamp(
+    content.startsWith('[Script Info]')
+      ? parseASS(content).subtitles
+      : parseSRT(content))
 
-  const previous_context = `` // context episode 1-9
+  const previous_context = ""
 
   const input: ContextExtractionInput = {
     episode: 10,
-    subtitle,
+    subtitles,
     previous_context,
   }
 

@@ -21,9 +21,15 @@ const SettingDetailSchema = z.object({
 })
 
 // Input
+const subtitleSchema = z.object({
+  index: z.number(),
+  actor: z.string(),
+  content: z.string(),
+})
+
 export const BatchExtractionInputSchema = z.object({
   episode: z.number(),
-  subtitle: z.string(),
+  subtitles: z.array(subtitleSchema),
 })
 
 // Output

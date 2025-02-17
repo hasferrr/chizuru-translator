@@ -6,6 +6,8 @@ import { extractContextPartialJson } from './src/lib/context-extraction-partial/
 import { parseContextExtractionJson } from './src/lib/context-extraction-partial/parser'
 import { ContextManager } from './src/lib/context-extraction-partial/context-manager'
 import { getFullResponse } from './src/utils/stream-response'
+import { removeTimestamp } from './src/utils/subtitle-utils'
+import type { SubtitleNoTime } from './src/types/types'
 
 // --- Configuration ---
 const API_KEY = process.env.OPENAI_API_KEY
@@ -18,20 +20,15 @@ const CONTEXT_FILE = './context-extracted/context-batch.txt'
 // --- Helper Functions ---
 
 // Function to read and parse an SRT file
-async function readAndParseSRT(filePath: string): Promise<string> {
+async function readAndParseSRT(filePath: string): Promise<SubtitleNoTime[]> {
   try {
-    const data = await fs.readFile(filePath, 'utf-8')
-    const parsedSubtitles = data.startsWith('[Script Info]')
-      ? parseASS(data).subtitles
-      : parseSRT(data)
+    const content = await fs.readFile(filePath, 'utf-8')
+    const subtitle = removeTimestamp(
+      content.startsWith('[Script Info]')
+        ? parseASS(content).subtitles
+        : parseSRT(content))
 
-    // Format the subtitles into a single string
-    let subtitleText = ""
-    for (const sub of parsedSubtitles) {
-      subtitleText += `${sub.content}\n`
-    }
-
-    return subtitleText
+    return subtitle
 
   } catch (error) {
     console.error(`Error reading or parsing SRT file ${filePath}:`, error)
@@ -70,11 +67,11 @@ async function processSubtitles() {
 
       console.log(`Processing episode ${episodeNumber}: ${file}`)
 
-      const subtitleText = await readAndParseSRT(filePath)
+      const subtitles = await readAndParseSRT(filePath)
 
       const input = {
         episode: episodeNumber,
-        subtitle: subtitleText,
+        subtitles: subtitles,
       }
 
       const response = await getFullResponse(
