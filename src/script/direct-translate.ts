@@ -7,7 +7,7 @@ import { parseTranslationJson } from '../lib/translation/parser'
 import { mergeTranslated, removeTimestamp } from '../utils/subtitle-utils'
 import { getFullResponse } from '../utils/stream-response'
 
-export async function translateSubtitle(options: TranslateSubtitleOption): Promise<Subtitle[]> {
+export async function directTranslate(options: TranslateSubtitleOption): Promise<Subtitle[]> {
   const { subtitles, sourceLanguage, targetLanguage, contextDocument, split, apiKey, baseURL, model, temperature, maxTokens } = options
 
   // Make sure that the `log` directory exists

@@ -1,12 +1,12 @@
 import type { TranslateRawContentOptions } from "../types/types"
 import { mergeASSback } from "../utils/ass/merge"
 import { parseASS } from "../utils/ass/parse"
-import { translateSubtitle } from "./direct-translate"
+import { directTranslate } from "./direct-translate"
 
 export async function translateASS(options: TranslateRawContentOptions): Promise<string> {
   const parsed = parseASS(options.contentRaw)
 
-  const translated = await translateSubtitle({
+  const translated = await directTranslate({
     ...options,
     subtitles: parsed.subtitles,
   })
