@@ -4,7 +4,7 @@ import { extractContext } from './src/lib/context-extraction/extraction'
 import { parseSRT } from './src/utils/srt/parse'
 import { parseASS } from './src/utils/ass/parse'
 import type { ContextExtractionInput } from './src/types/types'
-import { getContent } from './src/utils/parse-response'
+import { getContent } from './src/utils/response-utils'
 import { getFullResponse } from './src/utils/stream-response'
 
 const API_KEY = process.env.OPENAI_API_KEY

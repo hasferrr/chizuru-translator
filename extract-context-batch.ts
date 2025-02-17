@@ -1,7 +1,8 @@
 import { promises as fs } from 'fs'
-import * as path from 'path'
+import path from 'path'
 import { parseSRT } from './src/utils/srt/parse'
-import { extractContextPartialJson, parseContextExtractionJSON } from './src/lib/context-extraction-partial/extraction-partial'
+import { extractContextPartialJson } from './src/lib/context-extraction-partial/extraction-partial'
+import { parseContextExtractionJson } from './src/lib/context-extraction-partial/parser'
 import { ContextManager } from './src/lib/context-extraction-partial/context-manager'
 import { getFullResponse } from './src/utils/stream-response'
 
@@ -83,7 +84,7 @@ async function processSubtitles() {
         })
       )
 
-      const extractedData = parseContextExtractionJSON(response)
+      const extractedData = parseContextExtractionJson(response)
       contextManager.updateContext(extractedData) // Update context
     }
     // write the final context

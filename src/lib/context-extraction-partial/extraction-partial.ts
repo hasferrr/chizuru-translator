@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { zodResponseFormat } from 'openai/helpers/zod'
 import { openai } from '../openai'
-import { BatchExtractionInputSchema, BatchExtractionOutputSchema, type BatchExtractionOutput } from './context-schema'
+import { BatchExtractionInputSchema, BatchExtractionOutputSchema } from './context-schema'
 import { contextExtractionPartialSystemMessage } from './system-message'
 import type { StreamChatCompletion } from '../../types/types'
 
@@ -35,15 +35,4 @@ export async function extractContextPartialJson({
   })
 
   return stream
-}
-
-export function parseContextExtractionJSON(response: string): BatchExtractionOutput {
-  try {
-    const parsedData = BatchExtractionOutputSchema.parse(JSON.parse(response))
-    return parsedData
-  } catch (error) {
-    console.error("Error parsing JSON output:", error)
-    console.log("Raw output:", response)
-    throw new Error("Invalid JSON output from API call.")
-  }
 }

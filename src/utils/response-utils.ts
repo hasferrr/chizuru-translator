@@ -1,5 +1,3 @@
-import type { SubtitleNoTime, SubtitleNoTimeTranslated } from "../types/types"
-
 function keepOnlyWrapped(text: string, a: string, b: string): string {
   const startA = text.indexOf(a)
   if (startA === -1) return ''
@@ -16,11 +14,7 @@ function removeWrapped(text: string, a: string, b: string): string {
   return text.substring(0, startA) + text.substring(startB + b.length)
 }
 
-export function getThink(response: string): string {
-  return keepOnlyWrapped(response, '<think>', '</think>')
-}
-
-export function getJson(response: string): SubtitleNoTime[] {
+export function cleanUpJsonResponse(response: string): string {
   const a = '```json'
   const b = '```'
   const removedThink = removeWrapped(response, '<think>', '</think>')
@@ -28,11 +22,11 @@ export function getJson(response: string): SubtitleNoTime[] {
     || keepOnlyWrapped(removedThink, b, b).replaceAll(b, '')
     || removedThink.replaceAll(a, '').replaceAll(b, '')
     || '[]'
-  const subtitles = JSON.parse(jsonString) as SubtitleNoTimeTranslated[]
-  return subtitles.map((sub) => ({
-    index: sub.index,
-    content: sub.translated || '',
-  }))
+  return jsonString
+}
+
+export function getThink(response: string): string {
+  return keepOnlyWrapped(response, '<think>', '</think>')
 }
 
 export function getContent(response: string): string {

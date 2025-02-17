@@ -3,8 +3,8 @@ import path from 'path'
 import type { ChatCompletionMessageParam } from 'openai/resources/index.mjs'
 import type { Subtitle, TranslateSubtitleOption } from '../types/types'
 import { translateSubtitles } from '../lib/translation/translator'
+import { parseTranslationJson } from '../lib/translation/parser'
 import { mergeTranslated, removeTimestamp } from '../utils/subtitle-utils'
-import { getJson } from '../utils/parse-response'
 import { getFullResponse } from '../utils/stream-response'
 
 export async function translateSubtitle(options: TranslateSubtitleOption): Promise<Subtitle[]> {
@@ -25,7 +25,7 @@ export async function translateSubtitle(options: TranslateSubtitleOption): Promi
   }
 
   // Translate each chunk of subtitles from Japanese to Indonesian
-  const translatedChunks: ReturnType<typeof getJson>[] = []
+  const translatedChunks: ReturnType<typeof parseTranslationJson>[] = []
   const context: ChatCompletionMessageParam[] = []
   for (let i = 0; i < subtitleChunks.length; i++) {
     const chunk = removeTimestamp(subtitleChunks[i])
@@ -43,7 +43,7 @@ export async function translateSubtitle(options: TranslateSubtitleOption): Promi
         contextMessage: context,
       })
     )
-    const json = getJson(chunkResponse)
+    const json = parseTranslationJson(chunkResponse)
     translatedChunks.push(json)
     context.push({
       role: 'user',
