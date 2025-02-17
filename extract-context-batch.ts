@@ -1,6 +1,7 @@
 import { promises as fs } from 'fs'
 import path from 'path'
 import { parseSRT } from './src/utils/srt/parse'
+import { parseASS } from './src/utils/ass/parse'
 import { extractContextPartialJson } from './src/lib/context-extraction-partial/extraction-partial'
 import { parseContextExtractionJson } from './src/lib/context-extraction-partial/parser'
 import { ContextManager } from './src/lib/context-extraction-partial/context-manager'
@@ -20,7 +21,9 @@ const CONTEXT_FILE = './context-extracted/context-batch.txt'
 async function readAndParseSRT(filePath: string): Promise<string> {
   try {
     const data = await fs.readFile(filePath, 'utf-8')
-    const parsedSubtitles = parseSRT(data)
+    const parsedSubtitles = data.startsWith('[Script Info]')
+      ? parseASS(data).subtitles
+      : parseSRT(data)
 
     // Format the subtitles into a single string
     let subtitleText = ""

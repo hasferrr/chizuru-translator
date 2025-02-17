@@ -19,7 +19,9 @@ async function processSubtitles() {
   const content = fs.readFileSync(INPUT_FILE, 'utf-8')
 
   let subtitle = ''
-  const parsedSubtitles = parseSRT(parseASS(content).output.join('\n'))
+  const parsedSubtitles = content.startsWith('[Script Info]')
+    ? parseASS(content).subtitles
+    : parseSRT(content)
   for (const sub of parsedSubtitles) {
     subtitle += `${sub.content}\n`
   }

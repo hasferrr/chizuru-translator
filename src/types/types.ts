@@ -24,18 +24,29 @@ export type SubtitleNoTimeTranslated = SubtitleNoTime & {
 }
 
 export interface ASSParseOutput {
-  output: string[]
-  styleOnly: string[]
-  textOnly: string[]
-  commentsOnly: string[]
-  header: string[]
-  footer: string[]
-  order: DialogueType[]
+  subtitles: Subtitle[]
+  header: string
+  events: SubtitleEvent[]
+  footer: string
 }
 
 export enum DialogueType {
   Dialogue,
   Comment,
+}
+
+export interface SubtitleEvent {
+  format: 'Dialogue' | 'Comment'
+  layer: number
+  start: string
+  end: string
+  style: string
+  name: string
+  marginL: string
+  marginR: string
+  marginV: string
+  effect: string
+  text: string
 }
 
 export interface TranslateSubtitleOption {
