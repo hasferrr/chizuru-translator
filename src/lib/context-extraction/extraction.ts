@@ -7,7 +7,7 @@ interface ExtractContextParams {
   apiKey?: string
   baseURL: string
   model: string
-  maxTokens?: number
+  maxCompletionTokens?: number
 }
 
 export async function extractContext({
@@ -15,7 +15,7 @@ export async function extractContext({
   apiKey,
   baseURL,
   model,
-  maxTokens,
+  maxCompletionTokens,
 }: ExtractContextParams): Promise<StreamChatCompletion> {
   const inputJsonString = JSON.stringify(input)
 
@@ -27,7 +27,7 @@ export async function extractContext({
     ],
     stream: true,
     temperature: 0.2,
-    max_tokens: Math.max(maxTokens || 0, 8000),
+    max_completion_tokens: Math.max(maxCompletionTokens || 0, 8000),
   })
 
   return stream

@@ -24,7 +24,7 @@ export const translationBodySchema = z.object({
   baseURL: z.string(),
   model: z.string(),
   temperature: z.number(),
-  maxTokens: z.number(),
+  maxCompletionTokens: z.number(),
   contextMessage: z.array(messageSchema),
 })
 
@@ -36,5 +36,5 @@ export const contextExtractionBodySchema = z.object({
   }),
   baseURL: z.string().url(),
   model: z.string(),
-  maxTokens: z.number().int().positive(),
+  maxCompletionTokens: z.number().int().positive(),
 })

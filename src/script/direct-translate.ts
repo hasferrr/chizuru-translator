@@ -8,7 +8,7 @@ import { mergeTranslated, removeTimestamp } from '../utils/subtitle-utils'
 import { getFullResponse } from '../utils/stream-response'
 
 export async function directTranslate(options: TranslateSubtitleOption): Promise<Subtitle[]> {
-  const { subtitles, sourceLanguage, targetLanguage, contextDocument, split, apiKey, baseURL, model, temperature, maxTokens } = options
+  const { subtitles, sourceLanguage, targetLanguage, contextDocument, split, apiKey, baseURL, model, temperature, maxCompletionTokens } = options
 
   // Make sure that the `log` directory exists
   if (!fs.existsSync('log')) {
@@ -39,7 +39,7 @@ export async function directTranslate(options: TranslateSubtitleOption): Promise
         baseURL,
         model,
         temperature,
-        maxTokens,
+        maxCompletionTokens,
         contextMessage: context,
       })
     )

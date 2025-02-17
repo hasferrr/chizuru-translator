@@ -39,7 +39,7 @@ async function processSubtitles() {
         apiKey: API_KEY,
         baseURL: BASE_URL,
         model: MODEL,
-        maxTokens: MAX_TOKENS,
+        maxCompletionTokens: MAX_TOKENS,
       }),
       'response-extraction.log',
     )

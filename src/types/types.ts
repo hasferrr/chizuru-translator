@@ -67,7 +67,7 @@ export interface TranslateSubtitleOption {
   baseURL: string
   model: string
   temperature: number
-  maxTokens: number
+  maxCompletionTokens: number
 }
 
 export type TranslateRawContentOptions = Omit<TranslateSubtitleOption, "subtitles"> & {

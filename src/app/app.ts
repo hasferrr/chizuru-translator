@@ -30,7 +30,7 @@ app.post('/api/stream/translate', extractTokens, async (req: Request<{}, {}, z.i
       baseURL,
       model,
       temperature,
-      maxTokens,
+      maxCompletionTokens,
       contextMessage,
     } = validatedRequest
 
@@ -44,7 +44,7 @@ app.post('/api/stream/translate', extractTokens, async (req: Request<{}, {}, z.i
       baseURL,
       model,
       temperature,
-      maxTokens,
+      maxCompletionTokens,
       contextMessage: contextMessage.map((message) => ({
         role: message.role,
         content: JSON.stringify(message.content),
@@ -69,7 +69,7 @@ app.post('/api/stream/extract-context', extractTokens, async (req: Request<{}, {
       input,
       baseURL,
       model,
-      maxTokens,
+      maxCompletionTokens,
     } = validatedRequest
 
     // Initiate the extraction stream
@@ -78,7 +78,7 @@ app.post('/api/stream/extract-context', extractTokens, async (req: Request<{}, {
       apiKey: req.apiKey,
       baseURL,
       model,
-      maxTokens,
+      maxCompletionTokens,
     })
 
     await handleStreaming(stream, req, res)
