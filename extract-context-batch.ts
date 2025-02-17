@@ -1,16 +1,18 @@
 import { promises as fs } from 'fs'
-import path from 'path'
-import { extractContext, getFullResponse } from './src/lib/context-extraction/extraction'
+import * as path from 'path'
 import { parseSRT } from './src/utils/srt/parse'
-import type { ContextExtractionInput } from './src/types/types'
-import { getContent } from './src/utils/parse-response'
+import { extractContextPartialJson, getFullResponse, parseContextExtractionJSON } from './src/lib/context-extraction-partial/extraction-partial'
+import { ContextManager } from './src/lib/context-extraction-partial/context-manager'
 
+// --- Configuration ---
 const API_KEY = process.env.OPENAI_API_KEY
 const BASE_URL = "https://api.fireworks.ai/inference/v1"
 const MODEL = "accounts/fireworks/models/deepseek-v3"
 const MAX_TOKENS = 40_000
 const SUBTITLES_DIR = './subtitles'
-const CONTEXT_DIR = './context-extracted'
+const CONTEXT_FILE = './context-extracted/context-batch.txt'
+
+// --- Helper Functions ---
 
 // Function to read and parse an SRT file
 async function readAndParseSRT(filePath: string): Promise<string> {
@@ -18,6 +20,7 @@ async function readAndParseSRT(filePath: string): Promise<string> {
     const data = await fs.readFile(filePath, 'utf-8')
     const parsedSubtitles = parseSRT(data)
 
+    // Format the subtitles into a single string
     let subtitleText = ""
     for (const sub of parsedSubtitles) {
       subtitleText += `${sub.content}\n`
@@ -27,19 +30,6 @@ async function readAndParseSRT(filePath: string): Promise<string> {
 
   } catch (error) {
     console.error(`Error reading or parsing SRT file ${filePath}:`, error)
-    throw error // Re-throw the error to be caught by the main loop
-  }
-}
-
-// Function to write the context document to a file
-async function writeContextToFile(context: string, episodeNumber: number): Promise<void> {
-  const fileName = `context_episode_${episodeNumber}.txt`
-  const filePath = path.join(CONTEXT_DIR, fileName)
-  try {
-    await fs.writeFile(filePath, context, 'utf-8')
-    console.log(`Context for episode ${episodeNumber} written to ${filePath}`)
-  } catch (error) {
-    console.error(`Error writing context to file ${filePath}:`, error)
     throw error // Re-throw the error
   }
 }
@@ -48,12 +38,13 @@ async function writeContextToFile(context: string, episodeNumber: number): Promi
 
 async function processSubtitles() {
   try {
-    await fs.mkdir(CONTEXT_DIR, { recursive: true })
+    // Ensure output directory exists
+    await fs.mkdir(path.dirname(CONTEXT_FILE), { recursive: true })
 
     const files = await fs.readdir(SUBTITLES_DIR)
     const srtFiles = files
       .filter(file => file.toLowerCase().endsWith('.srt'))
-      .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
+      .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }))
 
     if (srtFiles.length === 0) {
       console.log('No SRT files found in the subtitles directory.')
@@ -65,40 +56,40 @@ async function processSubtitles() {
     }
     console.log()
 
-    let previousContext = "" // Start with an empty context
+    const contextManager = new ContextManager()
 
     for (let i = 0; i < srtFiles.length; i++) {
       const file = srtFiles[i]
-      const episodeNumber = i + 1 // Episode numbers start at 1
+      const episodeNumber = i + 1
+      const filePath = path.join(SUBTITLES_DIR, file)
 
       console.log(`Processing episode ${episodeNumber}: ${file}`)
 
-      const filePath = path.join(SUBTITLES_DIR, file)
       const subtitleText = await readAndParseSRT(filePath)
 
-      const input: ContextExtractionInput = {
+      const input = {
         episode: episodeNumber,
         subtitle: subtitleText,
-        previous_context: previousContext,
       }
 
-      const updatedContext = getContent(
-        await getFullResponse(
-          await extractContext({
-            input,
-            apiKey: API_KEY,
-            baseURL: BASE_URL,
-            model: MODEL,
-            maxTokens: MAX_TOKENS,
-          })
-        )
+      const response = await getFullResponse(
+        await extractContextPartialJson({
+          input,
+          apiKey: API_KEY,
+          baseURL: BASE_URL,
+          model: MODEL,
+          maxTokens: MAX_TOKENS,
+        })
       )
 
-      await writeContextToFile(updatedContext, episodeNumber)
-      previousContext = updatedContext // Update for the next iteration
+      const extractedData = parseContextExtractionJSON(response)
+      contextManager.updateContext(extractedData) // Update context
     }
-
+    // write the final context
+    await fs.writeFile(CONTEXT_FILE, contextManager.getContextString(), 'utf-8')
+    console.log(`Final context written to ${CONTEXT_FILE}`)
     console.log('Subtitle processing complete.')
+
   } catch (error) {
     console.error('An error occurred during processing:', error)
   }
