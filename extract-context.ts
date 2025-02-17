@@ -40,7 +40,8 @@ async function processSubtitles() {
         baseURL: BASE_URL,
         model: MODEL,
         maxTokens: MAX_TOKENS,
-      })
+      }),
+      'response-extraction.log',
     )
   )
 
