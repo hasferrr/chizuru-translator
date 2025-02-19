@@ -10,7 +10,7 @@ import { contextExtractionBodySchema, translationBodySchema } from './schema'
 const app = express()
 
 app.use(cors({
-  origin: ['*'],
+  origin: '*',
   methods: ['POST'],
   allowedHeaders: ['Authorization', 'Content-Type']
 }))
