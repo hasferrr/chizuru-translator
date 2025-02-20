@@ -37,4 +37,5 @@ export const contextExtractionBodySchema = z.object({
   baseURL: z.string().url(),
   model: z.string(),
   maxCompletionTokens: z.number().int().positive(),
+  partial: z.boolean().optional(),
 })

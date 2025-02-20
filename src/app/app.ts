@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { errorHandler, extractTokens } from './middleware'
 import { handleStreaming } from './streaming-handler'
 import { extractContext } from '../lib/context-extraction/extraction'
+import { extractContextPartialJson } from '../lib/context-extraction-partial/extraction-partial'
 import { translateSubtitles } from '../lib/translation/translator'
 import { contextExtractionBodySchema, translationBodySchema } from './schema'
 
@@ -70,10 +71,13 @@ app.post('/api/stream/extract-context', extractTokens, async (req: Request<{}, {
       baseURL,
       model,
       maxCompletionTokens,
+      partial,
     } = validatedRequest
 
+    const extractContextFn = partial ? extractContextPartialJson : extractContext
+
     // Initiate the extraction stream
-    const stream = await extractContext({
+    const stream = await extractContextFn({
       input,
       apiKey: req.apiKey,
       baseURL,
