@@ -77,7 +77,7 @@ export type TranslateRawContentOptions = Omit<TranslateSubtitleOption, "subtitle
 }
 
 export interface ContextExtractionInput {
-  episode: number
+  episode: string
   subtitles: SubtitleNoTime[]
   previous_context: string
 }

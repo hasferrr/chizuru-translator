@@ -78,7 +78,11 @@ app.post('/api/stream/extract-context', extractTokens, async (req: Request<{}, {
 
     // Initiate the extraction stream
     const stream = await extractContextFn({
-      input,
+      input: {
+        episode: String(input.episode).trim(),
+        subtitles: input.subtitles,
+        previous_context: input.previous_context,
+      },
       apiKey: req.apiKey,
       baseURL,
       model,

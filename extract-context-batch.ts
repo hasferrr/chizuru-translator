@@ -70,7 +70,7 @@ async function processSubtitles() {
       const subtitles = await readAndParseSRT(filePath)
 
       const input = {
-        episode: episodeNumber,
+        episode: episodeNumber.toString(),
         subtitles: subtitles,
       }
 

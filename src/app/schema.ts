@@ -30,7 +30,7 @@ export const translationBodySchema = z.object({
 
 export const contextExtractionBodySchema = z.object({
   input: z.object({
-    episode: z.number().int(),
+    episode: z.string().or(z.number()),
     subtitles: z.array(subtitleSchema),
     previous_context: z.string(),
   }),

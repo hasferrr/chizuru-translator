@@ -28,13 +28,13 @@ const subtitleSchema = z.object({
 })
 
 export const BatchExtractionInputSchema = z.object({
-  episode: z.number(),
+  episode: z.string(),
   subtitles: z.array(subtitleSchema),
 })
 
 // Output
 export const BatchExtractionOutputSchema = z.object({
-  episode: z.number(),
+  episode: z.string(),
   new_characters: z.array(CharacterSchema),
   new_terminology: z.array(TerminologySchema),
   new_setting_details: z.array(SettingDetailSchema),

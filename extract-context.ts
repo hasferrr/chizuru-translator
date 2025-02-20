@@ -27,7 +27,7 @@ async function processSubtitles() {
   const previous_context = ""
 
   const input: ContextExtractionInput = {
-    episode: 10,
+    episode: "10",
     subtitles,
     previous_context,
   }
