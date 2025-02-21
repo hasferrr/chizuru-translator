@@ -1,7 +1,8 @@
 import express, { type NextFunction, type Request, type Response } from 'express'
 import cors from 'cors'
-import { z } from 'zod'
-import { errorHandler, extractTokens } from './middleware'
+import helmet from 'helmet'
+import rateLimit from 'express-rate-limit'
+import { delayRequests, errorHandler, extractTokens, perApiKeyRateLimit } from './middleware'
 import { handleStreaming } from './streaming-handler'
 import { extractContext } from '../lib/context-extraction/extraction'
 import { extractContextPartialJson } from '../lib/context-extraction-partial/extraction-partial'
@@ -10,92 +11,151 @@ import { contextExtractionBodySchema, translationBodySchema } from './schema'
 
 const app = express()
 
+app.set('trust proxy', true)
+
+app.use(helmet())
+
+const allowedOrigin = process.env.ALLOWED_ORIGIN?.split(',') || []
 app.use(cors({
-  origin: '*',
+  origin: allowedOrigin,
   methods: ['POST'],
   allowedHeaders: ['Authorization', 'Content-Type']
 }))
+
 app.use(express.json())
 
-app.post('/api/stream/translate', extractTokens, async (req: Request<{}, {}, z.infer<typeof translationBodySchema>>, res: Response, next: NextFunction) => {
-  try {
-    console.log('Handling translation...')
+// --- Rate Limiting ---
 
-    // Validate and parse the request body
-    const validatedRequest = translationBodySchema.parse(req.body)
-    const {
-      subtitles,
-      sourceLanguage,
-      targetLanguage,
-      contextDocument,
-      baseURL,
-      model,
-      temperature,
-      maxCompletionTokens,
-      contextMessage,
-    } = validatedRequest
-
-    // Initiate the translation stream
-    const stream = await translateSubtitles({
-      subtitles: subtitles.map(({ index, actor, content }) => ({ index, actor, content })),
-      sourceLanguage,
-      targetLanguage,
-      contextDocument,
-      apiKey: req.apiKey,
-      baseURL,
-      model,
-      temperature,
-      maxCompletionTokens,
-      contextMessage: contextMessage.map((message) => ({
-        role: message.role,
-        content: JSON.stringify(message.content),
-      })),
-    })
-
-    await handleStreaming(stream, req, res)
-    res.end()
-
-  } catch (error) {
-    next(error)
-  }
+const rateLimitTranslateFree = rateLimit({
+  windowMs: 1 * 60 * 1000, // 2 minute window
+  max: 15, // 10 requests
+  message: 'Too many free translation requests, please try again later',
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => {
+    console.log(req.ip)
+    return req.ips.length > 0 ? req.ips[req.ips.length - 1] : req.ip ?? '127.0.0.1'
+  },
 })
 
-app.post('/api/stream/extract-context', extractTokens, async (req: Request<{}, {}, z.infer<typeof contextExtractionBodySchema>>, res: Response, next: NextFunction) => {
-  try {
-    console.log('Handling context extraction...')
-
-    // Validate and parse the request body
-    const validatedRequest = contextExtractionBodySchema.parse(req.body)
-    const {
-      input,
-      baseURL,
-      model,
-      maxCompletionTokens,
-      partial,
-    } = validatedRequest
-
-    const extractContextFn = partial ? extractContextPartialJson : extractContext
-
-    // Initiate the extraction stream
-    const stream = await extractContextFn({
-      input: {
-        episode: String(input.episode).trim(),
-        subtitles: input.subtitles,
-        previous_context: input.previous_context,
-      },
-      apiKey: req.apiKey,
-      baseURL,
-      model,
-      maxCompletionTokens,
-    })
-
-    await handleStreaming(stream, req, res)
-    res.end()
-
-  } catch (error) {
-    next(error)
-  }
+const rateLimitApiKeyTranslate = perApiKeyRateLimit({
+  windowMs: 5 * 60 * 1000,
+  max: 50,
+  message: 'Too many translation requests from this OpenAI API key, please try again after 5 minutes',
 })
+
+const rateLimitApiKeyExtractContext = perApiKeyRateLimit({
+  windowMs: 5 * 60 * 1000,
+  max: 30,
+  message: 'Too many context extraction requests from this OpenAI API key, please try again after 5 minutes',
+})
+
+// --- Routes ---
+
+app.post(
+  '/api/test',
+  extractTokens,
+  rateLimitApiKeyTranslate,
+  async (req: Request, res: Response, next: NextFunction) => {
+    res.json({ message: 'Hello, world!' })
+  })
+
+app.post(
+  '/api/stream/translate-free',
+  rateLimitTranslateFree,
+  delayRequests(1000),
+  async (req: Request, res: Response, next: NextFunction) => {
+    // TODO: Implement free translation
+    res.json({ message: 'Free' })
+  })
+
+app.post(
+  '/api/stream/translate',
+  extractTokens,
+  rateLimitApiKeyTranslate,
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      console.log('Handling translation...')
+
+      // Validate and parse the request body
+      const validatedRequest = translationBodySchema.parse(req.body)
+      const {
+        subtitles,
+        sourceLanguage,
+        targetLanguage,
+        contextDocument,
+        baseURL,
+        model,
+        temperature,
+        maxCompletionTokens,
+        contextMessage,
+      } = validatedRequest
+
+      // Initiate the translation stream
+      const stream = await translateSubtitles({
+        subtitles: subtitles.map(({ index, actor, content }) => ({ index, actor, content })),
+        sourceLanguage,
+        targetLanguage,
+        contextDocument,
+        apiKey: req.apiKey,
+        baseURL,
+        model,
+        temperature,
+        maxCompletionTokens,
+        contextMessage: contextMessage.map((message) => ({
+          role: message.role,
+          content: JSON.stringify(message.content),
+        })),
+      })
+
+      await handleStreaming(stream, req, res)
+      res.end()
+
+    } catch (error) {
+      next(error)
+    }
+  })
+
+app.post(
+  '/api/stream/extract-context',
+  extractTokens,
+  rateLimitApiKeyExtractContext,
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      console.log('Handling context extraction...')
+
+      // Validate and parse the request body
+      const validatedRequest = contextExtractionBodySchema.parse(req.body)
+      const {
+        input,
+        baseURL,
+        model,
+        maxCompletionTokens,
+        partial,
+      } = validatedRequest
+
+      const extractContextFn = partial ? extractContextPartialJson : extractContext
+
+      // Initiate the extraction stream
+      const stream = await extractContextFn({
+        input: {
+          episode: String(input.episode).trim(),
+          subtitles: input.subtitles,
+          previous_context: input.previous_context,
+        },
+        apiKey: req.apiKey,
+        baseURL,
+        model,
+        maxCompletionTokens,
+      })
+
+      await handleStreaming(stream, req, res)
+      res.end()
+
+    } catch (error) {
+      next(error)
+    }
+  })
 
 app.use(errorHandler)
 
