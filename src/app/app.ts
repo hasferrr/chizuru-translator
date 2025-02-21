@@ -7,6 +7,7 @@ import { errorHandler } from './middlewares/middleware'
 import { logger } from './logger'
 
 const app = express()
+console.log("NODE_ENV: ",process.env.NODE_ENV)
 
 app.set('trust proxy', true)
 

@@ -16,16 +16,22 @@ export async function handleStreaming(stream: StreamChatCompletion, req: Request
     stream.controller.abort()
   })
 
+  const isDevelopment = process.env.NODE_ENV !== 'production'
+
   // Stream chunks to the client
   for await (const chunk of stream) {
     if (!isClientConnected) break
 
     const content = chunk.choices[0]?.delta?.content || ''
     res.write(content)
-    process.stdout.write(content)
+    if (isDevelopment) {
+      process.stdout.write(content)
+    }
   }
 
   // Finalize the stream
   res.write('\n')
-  process.stdout.write('\n')
+  if (isDevelopment) {
+    process.stdout.write('\n')
+  }
 }
