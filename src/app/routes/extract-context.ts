@@ -30,6 +30,7 @@ async function handleExtractContextRequest(req: Request, res: Response, next: Ne
       partial,
     } = validatedRequest
 
+    let usedModel = model
     let usedApiKey = apiKey
     let usedBaseURL = baseURL
 
@@ -40,6 +41,7 @@ async function handleExtractContextRequest(req: Request, res: Response, next: Ne
         return
       }
       const modelData = modelMap.get(model)!
+      usedModel = modelData.model
       usedApiKey = modelData.apiKey
       usedBaseURL = modelData.baseURL
     }
@@ -55,7 +57,7 @@ async function handleExtractContextRequest(req: Request, res: Response, next: Ne
       },
       apiKey: usedApiKey,
       baseURL: usedBaseURL,
-      model,
+      model: usedModel,
       maxCompletionTokens,
     })
 

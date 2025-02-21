@@ -33,6 +33,7 @@ async function handleTranslateRequest(req: Request, res: Response, next: NextFun
       contextMessage,
     } = validatedRequest
 
+    let usedModel = model
     let usedApiKey = apiKey
     let usedBaseURL = baseURL
 
@@ -43,6 +44,7 @@ async function handleTranslateRequest(req: Request, res: Response, next: NextFun
         return
       }
       const modelData = modelMap.get(model)!
+      usedModel = modelData.model
       usedApiKey = modelData.apiKey
       usedBaseURL = modelData.baseURL
     }
@@ -55,7 +57,7 @@ async function handleTranslateRequest(req: Request, res: Response, next: NextFun
       contextDocument,
       apiKey: usedApiKey,
       baseURL: usedBaseURL,
-      model,
+      model: usedModel,
       temperature,
       maxCompletionTokens,
       contextMessage: contextMessage.map((message) => ({
