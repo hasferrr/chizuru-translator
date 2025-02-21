@@ -8,10 +8,23 @@ import { extractContext } from '../lib/context-extraction/extraction'
 import { extractContextPartialJson } from '../lib/context-extraction-partial/extraction-partial'
 import { translateSubtitles } from '../lib/translation/translator'
 import { contextExtractionBodySchema, translationBodySchema } from './schema'
+import { logger } from './logger'
 
 const app = express()
 
 app.set('trust proxy', true)
+
+// --- Middleware ---
+
+// Request Logging Middleware (using the imported logger)
+app.use((req: Request, res: Response, next: NextFunction) => {
+  const start = Date.now()
+  res.on('finish', () => {
+    const duration = Date.now() - start
+    logger.info(`${req.method} ${req.originalUrl} ${res.statusCode} - ${duration}ms`, { ip: req.ip }) // Log IP as metadata
+  })
+  next()
+})
 
 app.use(helmet())
 
@@ -27,14 +40,17 @@ app.use(express.json())
 // --- Rate Limiting ---
 
 const rateLimitTranslateFree = rateLimit({
-  windowMs: 1 * 60 * 1000, // 2 minute window
-  max: 15, // 10 requests
+  windowMs: 1 * 60 * 1000, // 1 minute window
+  max: 15, // 15 requests
   message: 'Too many free translation requests, please try again later',
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) => {
-    console.log(req.ip)
     return req.ips.length > 0 ? req.ips[req.ips.length - 1] : req.ip ?? '127.0.0.1'
+  },
+  handler: (req, res, next) => {
+    logger.warn(`Rate limit exceeded`, { ip: req.ip, url: req.originalUrl })
+    res.status(429).send({ message: 'Too many requests, please try again later' })
   },
 })
 
@@ -57,6 +73,7 @@ app.post(
   extractTokens,
   rateLimitApiKeyTranslate,
   async (req: Request, res: Response, next: NextFunction) => {
+    logger.info(`Test endpoint hit`, { ip: req.ip })
     res.json({ message: 'Hello, world!' })
   })
 
@@ -66,6 +83,7 @@ app.post(
   delayRequests(1000),
   async (req: Request, res: Response, next: NextFunction) => {
     // TODO: Implement free translation
+    logger.info(`Free translation request`, { ip: req.ip })
     res.json({ message: 'Free' })
   })
 
@@ -75,7 +93,7 @@ app.post(
   rateLimitApiKeyTranslate,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      console.log('Handling translation...')
+      logger.info(`Handling translation request`, { ip: req.ip })
 
       // Validate and parse the request body
       const validatedRequest = translationBodySchema.parse(req.body)
@@ -112,6 +130,11 @@ app.post(
       res.end()
 
     } catch (error) {
+      if (error instanceof Error) {
+        logger.error(`Translation request failed`, { ip: req.ip, error: error.message, stack: error.stack }) // Log stack trace
+      } else {
+        logger.error(`Translation request failed`, { ip: req.ip, error: String(error) }) // Log unknown error
+      }
       next(error)
     }
   })
@@ -122,7 +145,7 @@ app.post(
   rateLimitApiKeyExtractContext,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      console.log('Handling context extraction...')
+      logger.info(`Handling context extraction request`, { ip: req.ip })
 
       // Validate and parse the request body
       const validatedRequest = contextExtractionBodySchema.parse(req.body)
@@ -153,6 +176,11 @@ app.post(
       res.end()
 
     } catch (error) {
+      if (error instanceof Error) {
+        logger.error(`Context extraction request failed`, { ip: req.ip, error: error.message, stack: error.stack }) // Log stack trace
+      } else {
+        logger.error(`Context extraction request failed`, { ip: req.ip, error: String(error) }) // Log unknown error
+      }
       next(error)
     }
   })
