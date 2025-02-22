@@ -6,6 +6,7 @@ import { logger } from '../logger'
 import { modelMap } from '../model-map'
 import { extractTokens } from '../middlewares/middleware'
 import { rateLimitTranslateFree, rateLimitApiKeyTranslate } from '../middlewares/rate-limiters'
+import { capitalizeWords } from '../../utils/utils'
 
 const router = express.Router()
 
@@ -52,8 +53,8 @@ async function handleTranslateRequest(req: Request, res: Response, next: NextFun
     // Initiate the translation stream
     const stream = await translateSubtitles({
       subtitles: subtitles.map(({ index, actor, content }) => ({ index, actor, content })),
-      sourceLanguage,
-      targetLanguage,
+      sourceLanguage: capitalizeWords(sourceLanguage),
+      targetLanguage: capitalizeWords(targetLanguage),
       contextDocument,
       apiKey: usedApiKey,
       baseURL: usedBaseURL,
