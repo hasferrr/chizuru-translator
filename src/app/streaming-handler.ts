@@ -1,5 +1,6 @@
 import { type Request, type Response } from 'express'
 import type { StreamChatCompletion } from '../types/types'
+import { logger } from './logger'
 
 export async function handleStreaming(stream: StreamChatCompletion, req: Request, res: Response) {
   // Set streaming headers
@@ -12,7 +13,7 @@ export async function handleStreaming(stream: StreamChatCompletion, req: Request
   let isClientConnected = true
   req.on('close', () => {
     isClientConnected = false
-    console.log('Client disconnected - aborting stream')
+    logger.info('Client disconnected - aborting stream')
     stream.controller.abort()
   })
 

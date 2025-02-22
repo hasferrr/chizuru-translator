@@ -1,6 +1,7 @@
 import { type NextFunction, type Request, type Response } from 'express'
 import { APIError } from 'openai'
 import { ZodError } from 'zod'
+import { logger } from '../logger'
 
 export function extractTokens(req: Request, res: Response, next: NextFunction): void {
   const authHeader = req.headers.authorization || ''
@@ -18,12 +19,12 @@ export function extractTokens(req: Request, res: Response, next: NextFunction): 
 }
 
 export function errorHandler(error: unknown, req: Request, res: Response, next: NextFunction) {
-  console.error('Error:', error)
+  logger.error('Error:', error)
 
   if (error instanceof ZodError) {
     res.status(400).json({ error: 'Validation failed', details: error.errors })
   } else if (error instanceof Error && error.name === 'AbortError') {
-    console.log('Stream aborted')
+    logger.info('Stream aborted')
     res.status(200).end()
   } else if (error instanceof APIError) {
     res.status(error.status || 500).json({ error: error.message, details: error.error })

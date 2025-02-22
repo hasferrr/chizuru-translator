@@ -7,7 +7,7 @@ import { errorHandler } from './middlewares/middleware'
 import { logger } from './logger'
 
 const app = express()
-console.log("NODE_ENV: ",process.env.NODE_ENV)
+console.log("NODE_ENV: ", process.env.NODE_ENV)
 
 app.set('trust proxy', true)
 
@@ -25,6 +25,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 app.use(helmet())
 
 const allowedOrigin = process.env.ALLOWED_ORIGIN?.split(',') || []
+console.log("ALLOWED_ORIGIN: ", allowedOrigin)
 app.use(cors({
   origin: allowedOrigin,
   methods: ['POST'],
