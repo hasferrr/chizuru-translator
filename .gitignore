@@ -183,3 +183,4 @@ translated.json
 *.srt
 *.ass
 context-extracted/
+run/secrets
