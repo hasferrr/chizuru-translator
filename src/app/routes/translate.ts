@@ -67,6 +67,15 @@ async function handleTranslateRequest(req: Request, res: Response, next: NextFun
       })),
     })
 
+    logger.info("Translation request model details", {
+      ip: req.ip,
+      model: usedModel,
+      baseURL: usedBaseURL,
+      sourceLanguage,
+      targetLanguage,
+      isFreeRequest: !apiKey,
+    })
+
     await handleStreaming(stream, req, res)
     res.end()
 

@@ -61,6 +61,13 @@ async function handleExtractContextRequest(req: Request, res: Response, next: Ne
       maxCompletionTokens,
     })
 
+    logger.info("Extraction request model details", {
+      ip: req.ip,
+      model: usedModel,
+      baseURL: usedBaseURL,
+      isFreeRequest: !apiKey,
+    })
+
     await handleStreaming(stream, req, res)
     res.end()
 
