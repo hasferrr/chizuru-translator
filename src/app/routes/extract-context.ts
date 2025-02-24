@@ -61,7 +61,9 @@ async function handleExtractContextRequest(req: Request, res: Response, next: Ne
       maxCompletionTokens,
     })
 
-    logger.info("Extraction request model details", {
+    logger.info(apiKey
+      ? "Handling context extraction request"
+      : "Free context extraction request", {
       ip: req.ip,
       model: usedModel,
       baseURL: usedBaseURL,

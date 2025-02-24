@@ -67,7 +67,10 @@ async function handleTranslateRequest(req: Request, res: Response, next: NextFun
       })),
     })
 
-    logger.info("Translation request model details", {
+
+    logger.info(apiKey
+      ? "Handling translation request model details"
+      : "Free translation request model details", {
       ip: req.ip,
       model: usedModel,
       baseURL: usedBaseURL,
