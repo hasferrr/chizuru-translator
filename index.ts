@@ -2,8 +2,8 @@ import fs from "fs"
 import { translateRawContent } from "./src/script/direct-translate-raw"
 
 const API_KEY = process.env.OPENAI_API_KEY
-const BASE_URL = "https://api.fireworks.ai/inference/v1"
-const MODEL = "accounts/fireworks/models/deepseek-r1"
+const BASE_URL = "https://api.deepseek.com"
+const MODEL = "deepseek-reasoner"
 
 const main = async () => {
   const translated = await translateRawContent("ass", {

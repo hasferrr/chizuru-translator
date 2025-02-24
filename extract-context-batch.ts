@@ -11,8 +11,8 @@ import type { SubtitleNoTime } from './src/types/types'
 
 // --- Configuration ---
 const API_KEY = process.env.OPENAI_API_KEY
-const BASE_URL = "https://api.fireworks.ai/inference/v1"
-const MODEL = "accounts/fireworks/models/deepseek-v3"
+const BASE_URL = "https://api.deepseek.com"
+const MODEL = "deepseek-chat"
 const MAX_TOKENS = 40_000
 const SUBTITLES_DIR = './subtitles'
 const CONTEXT_FILE = './context-extracted/context-batch.txt'
