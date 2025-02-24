@@ -31,6 +31,7 @@ async function handleTranslateRequest(req: Request, res: Response, next: NextFun
       model,
       temperature,
       maxCompletionTokens,
+      structuredOutput,
       contextMessage,
     } = validatedRequest
 
@@ -61,6 +62,7 @@ async function handleTranslateRequest(req: Request, res: Response, next: NextFun
       model: usedModel,
       temperature,
       maxCompletionTokens,
+      structuredOutput,
       contextMessage: contextMessage.map((message) => ({
         role: message.role,
         content: JSON.stringify(message.content),

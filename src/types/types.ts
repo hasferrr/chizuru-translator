@@ -69,6 +69,7 @@ export interface TranslateSubtitleOption {
   baseURL: string
   model: string
   temperature: number
+  structuredOutput: boolean
   maxCompletionTokens: number
 }
 

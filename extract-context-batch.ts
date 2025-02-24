@@ -81,6 +81,7 @@ async function processSubtitles() {
           baseURL: BASE_URL,
           model: MODEL,
           maxCompletionTokens: MAX_TOKENS,
+          structuredOutput: true,
         }),
         'response-extraction.log',
       )

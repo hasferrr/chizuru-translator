@@ -11,6 +11,7 @@ interface ExtractContextParams {
   baseURL: string
   model: string
   maxCompletionTokens: number
+  structuredOutput: boolean
 }
 
 export async function extractContextPartialJson({
@@ -19,6 +20,7 @@ export async function extractContextPartialJson({
   baseURL,
   model,
   maxCompletionTokens,
+  structuredOutput,
 }: ExtractContextParams): Promise<StreamChatCompletion> {
   const inputJsonString = JSON.stringify(input)
 
@@ -29,7 +31,9 @@ export async function extractContextPartialJson({
       { role: 'user', content: inputJsonString },
     ],
     stream: true,
-    response_format: zodResponseFormat(BatchExtractionOutputSchema, 'batch_extraction_output'),
+    response_format: structuredOutput
+      ? zodResponseFormat(BatchExtractionOutputSchema, 'batch_extraction_output')
+      : undefined,
     temperature: 0.2,
     max_completion_tokens: Math.max(maxCompletionTokens || 0, 8000),
   })

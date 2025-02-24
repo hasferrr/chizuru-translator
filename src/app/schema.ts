@@ -33,6 +33,7 @@ export const translationBodySchema = z.object({
   model: z.string(),
   temperature: z.number(),
   maxCompletionTokens: z.number(),
+  structuredOutput: z.boolean(),
   contextMessage: z.array(messageSchema),
 })
 

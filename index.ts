@@ -17,6 +17,7 @@ const main = async () => {
     split: 150 * 8,
     temperature: 0.6,
     maxCompletionTokens: 8000 * 8,
+    structuredOutput: true,
   })
   fs.writeFileSync("translated.ass", translated)
 }

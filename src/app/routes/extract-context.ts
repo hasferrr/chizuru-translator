@@ -59,6 +59,7 @@ async function handleExtractContextRequest(req: Request, res: Response, next: Ne
       baseURL: usedBaseURL,
       model: usedModel,
       maxCompletionTokens,
+      structuredOutput: !!partial,
     })
 
     logger.info(apiKey

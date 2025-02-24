@@ -18,6 +18,7 @@ curl -X POST \
     "model": "deepseek-reasoner",
     "temperature": 0.6,
     "maxCompletionTokens": 8129,
+    "structuredOutput": true,
     "contextMessage": [
       {
         "role": "user",
