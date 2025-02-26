@@ -16,18 +16,10 @@ const messageSchema = z.object({
   content: z.array(contentItemSchema),
 })
 
-const supportedLanguages = [
-  'indonesian',
-  'japanese',
-  'english',
-  'korean',
-  'chinese'
-] as const
-
 export const translationBodySchema = z.object({
   subtitles: z.array(subtitleSchema),
-  sourceLanguage: z.enum(supportedLanguages),
-  targetLanguage: z.enum(supportedLanguages),
+  sourceLanguage: z.string(),
+  targetLanguage: z.string(),
   contextDocument: z.string(),
   baseURL: z.string(),
   model: z.string(),
