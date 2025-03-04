@@ -22,7 +22,7 @@ interface TranslateSubtitlesParams {
   baseURL: string
   model: string
   temperature: number
-  maxCompletionTokens: number
+  maxCompletionTokens?: number
   structuredOutput: boolean
   contextMessage?: ChatCompletionMessageParam[]
 }
@@ -55,7 +55,7 @@ export async function translateSubtitles({
       ? zodResponseFormat(SubtitleSchema, 'subtitle_schema')
       : undefined,
     temperature: Math.min(Math.max(temperature, 0), 1.3),
-    max_completion_tokens: Math.max(maxCompletionTokens, 1),
+    max_completion_tokens: maxCompletionTokens ? Math.max(maxCompletionTokens, 1) : undefined,
   })
 
   return stream

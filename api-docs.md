@@ -17,7 +17,7 @@ curl -X POST \
     "baseURL": "https://api.deepseek.com",
     "model": "deepseek-reasoner",
     "temperature": 0.6,
-    "maxCompletionTokens": 8129,
+    "maxCompletionTokens": 8129, # <--- optional
     "structuredOutput": true,
     "contextMessage": [
       {
@@ -61,7 +61,7 @@ curl -X POST \
     "baseURL": "https://api.deepseek.com",
     "model": "deepseek-reasoner",
     "temperature": 0.2,
-    "maxCompletionTokens": 8129,
+    "maxCompletionTokens": 8129, # <--- optional
     "partial": false
   }' \
   http://localhost:4000/api/stream/extract-context

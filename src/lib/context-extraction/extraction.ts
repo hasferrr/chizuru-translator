@@ -27,7 +27,7 @@ export async function extractContext({
     ],
     stream: true,
     temperature: 0.2,
-    max_completion_tokens: Math.max(maxCompletionTokens || 0, 8000),
+    max_completion_tokens: maxCompletionTokens ? Math.max(maxCompletionTokens, 1) : undefined,
   })
 
   return stream

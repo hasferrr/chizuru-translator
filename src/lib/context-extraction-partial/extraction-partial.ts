@@ -10,7 +10,7 @@ interface ExtractContextParams {
   apiKey?: string
   baseURL: string
   model: string
-  maxCompletionTokens: number
+  maxCompletionTokens?: number
   structuredOutput: boolean
 }
 
@@ -35,7 +35,7 @@ export async function extractContextPartialJson({
       ? zodResponseFormat(BatchExtractionOutputSchema, 'batch_extraction_output')
       : undefined,
     temperature: 0.2,
-    max_completion_tokens: Math.max(maxCompletionTokens || 0, 8000),
+    max_completion_tokens: maxCompletionTokens ? Math.max(maxCompletionTokens, 1) : undefined,
   })
 
   return stream
