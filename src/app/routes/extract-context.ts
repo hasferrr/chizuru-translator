@@ -12,9 +12,6 @@ const router = express.Router()
 
 async function handleExtractContextRequest(req: Request, res: Response, next: NextFunction, apiKey?: string) {
   try {
-    const logMessage = apiKey ? 'Handling context extraction request' : 'Free context extraction request'
-    logger.info(logMessage, { ip: req.ip })
-
     // Bypass validation if apiKey is not provided (free request)
     if (!apiKey) {
       req.body.baseURL = "http://127.0.0.1"

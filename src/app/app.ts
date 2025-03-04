@@ -14,9 +14,10 @@ app.set('trust proxy', true)
 // Request Logging Middleware (using the imported logger)
 app.use((req: Request, res: Response, next: NextFunction) => {
   const start = Date.now()
+  logger.info(`--> ${req.method} ${req.originalUrl}`, { ip: req.ip })
   res.on('finish', () => {
     const duration = Date.now() - start
-    logger.info(`${req.method} ${req.originalUrl} ${res.statusCode} - ${duration}ms`, { ip: req.ip }) // Log IP as metadata
+    logger.info(`<-- ${req.method} ${req.originalUrl} ${res.statusCode} - ${duration}ms`, { ip: req.ip }) // Log IP as metadata
   })
   next()
 })
