@@ -19,7 +19,7 @@ export function extractTokens(req: Request, res: Response, next: NextFunction): 
 }
 
 export function errorHandler(error: unknown, req: Request, res: Response, next: NextFunction) {
-  logger.error('Error:', error)
+  res.setHeader('Content-Type', 'application/json')
 
   if (error instanceof ZodError) {
     res.status(400).json({ error: 'Validation failed', details: error.errors })
@@ -27,7 +27,7 @@ export function errorHandler(error: unknown, req: Request, res: Response, next: 
     logger.info('Stream aborted')
     res.status(200).end()
   } else if (error instanceof APIError) {
-    res.status(error.status || 500).json({ error: error.message, details: error.error })
+    res.status(Number(error.code) || 500).json({ error: error.message })
   } else if (error instanceof Error) {
     res.status(500).json({ error: error.message })
   } else {

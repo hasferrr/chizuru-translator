@@ -25,4 +25,3 @@ export const modelMap = new Map<string, ModelData>()
 for (const model of modelArray) {
   modelMap.set(model.name, model)
 }
-console.log(modelMap.keys())
